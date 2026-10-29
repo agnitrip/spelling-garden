@@ -96,8 +96,8 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .bee .wing{transform-origin:60px 40px;animation:flap .18s ease-in-out infinite alternate}
 @keyframes bob{50%{transform:translateY(-14px) rotate(-3deg)}}
 @keyframes flap{to{transform:scaleY(.6)}}
-.mode-btns{display:flex;flex-direction:column;gap:22px}
-.mode-btns .btn{min-width:min(360px,60vw);justify-content:flex-start}
+.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:20px 18px}
+.mode-btns .btn{min-width:min(300px,36vw);justify-content:flex-start;font-size:clamp(20px,3vmin,32px);text-align:left}
 .mode-btns .btn small{display:block;font-size:.5em;font-weight:500;opacity:.9}
 .mode-btns .btn .em{font-size:1.4em}
 
@@ -151,6 +151,30 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 
 #learn .card,#done .card{margin:auto 0}
 #learn .tile{--w:min(120px,calc(84vw / var(--n,6)))}
+/* build tray */
+.tray{width:min(1000px,100%);margin-top:auto;display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(8px,1.4vw,16px);padding:2vh 0 1vh;min-height:120px}
+.ltile{width:clamp(64px,10vmin,96px);height:clamp(72px,11vmin,106px);border:0;border-radius:18px;cursor:pointer;
+  font-family:inherit;font-weight:600;font-size:clamp(38px,6.4vmin,60px);color:#5a3500;
+  background:linear-gradient(180deg,#ffd76a,#ffb627);box-shadow:0 7px 0 var(--honey2),inset 0 3px 0 rgba(255,255,255,.5);
+  clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);transition:transform .15s,opacity .2s}
+.ltile:active{transform:translateY(5px) scale(.96)}
+.ltile.used{opacity:.18;pointer-events:none;transform:scale(.85)}
+.ltile.in{animation:drop .45s cubic-bezier(.3,1.7,.5,1) both}
+#buildSlots .tile{cursor:pointer}
+#build .card{margin-top:auto}
+#build .tray{margin:4vh 0 auto}
+/* challenge */
+.trophy{font-size:clamp(64px,12vmin,120px);animation:bob 2.4s ease-in-out infinite}
+.best{font-size:clamp(18px,2.6vmin,26px);color:var(--soft);min-height:1.2em}
+.toggle{display:inline-flex;align-items:center;gap:14px;border:0;background:#eef0f7;border-radius:999px;padding:10px 22px 10px 10px;
+  font:inherit;font-size:clamp(20px,3vmin,28px);font-weight:600;color:var(--ink);cursor:pointer}
+.toggle .knob{width:58px;height:34px;border-radius:999px;background:#c9cfdc;position:relative;transition:background .2s}
+.toggle .knob::after{content:"";position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.toggle[aria-pressed=true] .knob{background:var(--good)}
+.toggle[aria-pressed=true] .knob::after{left:28px}
+.clock{font-variant-numeric:tabular-nums}
+.res.miss{background:#fff1d6}
+.res .fix{color:var(--good2);font-weight:600}
 /* keyboard */
 .kb{width:min(1000px,100%);margin-top:auto;display:flex;flex-direction:column;gap:clamp(6px,1vh,12px);padding-top:1.5vh}
 .kb-row{display:flex;justify-content:center;gap:clamp(4px,.8vw,10px)}
@@ -187,6 +211,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 
 @media (orientation:portrait){
   .home-row{flex-direction:column;gap:1vh}
+  .mode-btns .btn{min-width:min(330px,44vw)}
 }
 @media (max-height:700px){ .card{padding:2vh 2vw;gap:1.2vh} }
 </style>
@@ -217,7 +242,9 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
       <div id="homeBee"></div>
       <div class="mode-btns">
         <button class="btn pink" id="learnBtn"><span class="em">👂</span><span>Listen &amp; Learn<small>Hear it, see it, say it</small></span></button>
+        <button class="btn" id="buildBtn"><span class="em">🧩</span><span>Build It<small>Put the letter tiles in order</small></span></button>
         <button class="btn green" id="spellBtn"><span class="em">✏️</span><span>Spell It!<small>Hear the word, spell it yourself</small></span></button>
+        <button class="btn honey" id="challengeBtn"><span class="em">🏆</span><span>Bee Challenge<small>20 words, no hints, like the real Bee</small></span></button>
       </div>
     </div>
     <div class="meadow">
@@ -240,9 +267,37 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     </div>
   </section>
 
-  <!-- SPELL -->
+  <!-- BUILD -->
+  <section class="screen" id="build">
+    <div class="topline"><div class="dots" id="buildDots"></div></div>
+    <div class="card">
+      <button class="speak-big" id="buildSpeak" aria-label="Hear the word">🔊</button>
+      <div class="sentence" id="buildSentence"></div>
+      <div class="tiles" id="buildSlots"></div>
+      <div class="feedback" id="buildFeedback"></div>
+      <div class="stars-earned" id="buildStars"></div>
+    </div>
+    <div class="tray" id="tray"></div>
+  </section>
+
+  <!-- CHALLENGE INTRO -->
+  <section class="screen" id="chIntro">
+    <div class="card done-card">
+      <div class="trophy">🏆</div>
+      <div class="feedback good">Bee Challenge</div>
+      <div class="sentence">You’ll hear <b id="chCount">20</b> words, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.</div>
+      <div class="best" id="chBest"></div>
+      <button class="toggle" id="timerToggle" aria-pressed="false"><span class="knob"></span><span id="timerLabel">⏱️ Timer: Off</span></button>
+      <div class="card-actions">
+        <button class="btn honey" id="chStart">🐝 Start!</button>
+        <button class="btn ghost" id="chBack">🏠 Garden</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPELL (also used by Bee Challenge) -->
   <section class="screen" id="spell">
-    <div class="topline"><div class="dots" id="spellDots"></div></div>
+    <div class="topline"><div class="dots" id="spellDots"></div><div class="chip clock" id="clock" hidden>⏱️ <span id="clockNum">0:00</span></div></div>
     <div class="card">
       <button class="speak-big" id="spellSpeak" aria-label="Hear the word">🔊</button>
       <div class="sentence" id="spellSentence"></div>
@@ -262,6 +317,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
       <div class="sentence" id="doneSub"></div>
       <div class="result-row" id="doneList"></div>
       <div class="card-actions">
+        <button class="btn pink" id="doneExtra" hidden></button>
         <button class="btn green" id="doneNext">Play again</button>
         <button class="btn ghost" id="doneHome">🏠 Garden</button>
       </div>
@@ -466,7 +522,7 @@ function renderHome() {
   renderHeader();
   $('#hello').textContent = player ? `Hi ${player}! Grow a flower for every word you learn!` : 'Grow a flower for every word you learn!';
   const L = activeList(), g = $('#garden');
-  $('#learnBtn').disabled = $('#spellBtn').disabled = !L;
+  $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
   if (!L) {
     g.innerHTML = `<div class="empty-note" style="grid-column:1/-1">🌱 No words yet! Ask a grown-up to press and hold ⚙️ to add words.</div>`;
     $('#gardenCount').textContent = ''; return;
@@ -530,7 +586,7 @@ function learnNext() {
   newRun(); endLearn();
 }
 function endLearn() {
-  show('done'); fillBee('#doneBee');
+  show('done'); fillBee('#doneBee'); doneExtra(null);
   $('#doneTitle').textContent = `You learned ${S.words.length} words!`;
   $('#doneScore').textContent = '🌱'.repeat(Math.min(S.words.length, 8));
   $('#doneSub').textContent = 'New sprouts are growing in your garden. Ready to spell them?';
@@ -545,7 +601,7 @@ function endLearn() {
 function startSpell(words) {
   const L = activeList(); if (!L) return;
   S = { mode: 'spell', list: L, words: words ? shuffle(words) : pickWords(L, 10, false), i: 0, marks: [], results: [] };
-  show('spell'); spellShow();
+  show('spell'); stopClock(); $('#clock').hidden = true; spellShow();
 }
 function spellShow() {
   const w = S.words[S.i];
@@ -565,6 +621,7 @@ async function promptWord() {
   if (w.s) { await wait(200); if (!await sayIf(id, w.s)) return; await wait(200); if (!await sayIf(id, w.w, { rate: 0.75 })) return; }
   $('#spellSpeak').classList.remove('talking');
 }
+function typing() { return S && (S.mode === 'spell' || S.mode === 'challenge'); }
 function cursorIndex() { return S.typed.findIndex((c, k) => !c && !S.locked[k]); }
 function renderSlots(extra = {}) {
   const box = $('#spellTiles'); const cur = cursorIndex();
@@ -579,18 +636,19 @@ function renderSlots(extra = {}) {
 }
 function renderGo() { const g = $('#kbGo'); if (g) { const full = cursorIndex() === -1; g.disabled = !full || S.busy; g.classList.toggle('pulse', full && !S.busy); } }
 function typeLetter(ch) {
-  if (!S || S.mode !== 'spell' || S.busy) return;
+  if (!typing() || S.busy) return;
   const k = cursorIndex(); if (k === -1) return;
   actx(); sfx.tap();
   S.typed[k] = ch; renderSlots({ [k]: 'in' }); renderGo();
 }
 function backspace() {
-  if (!S || S.mode !== 'spell' || S.busy) return;
+  if (!typing() || S.busy) return;
   for (let k = S.typed.length - 1; k >= 0; k--) if (S.typed[k] && !S.locked[k]) { S.typed[k] = ''; sfx.del(); break; }
   renderSlots(); renderGo();
 }
 async function check() {
   if (!S || S.busy || cursorIndex() !== -1) return;
+  if (S.mode === 'challenge') return challengeCheck();
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join('');
   const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
@@ -662,7 +720,7 @@ function endSpell() {
   const today = dayKey(0);
   if (streak.last !== today) { streak.n = streak.last === dayKey(-1) ? streak.n + 1 : 1; streak.last = today; }
   save(); renderHeader();
-  show('done'); fillBee('#doneBee');
+  show('done'); fillBee('#doneBee'); doneExtra(null);
   const title = perfect === S.results.length ? 'PERFECT ROUND!' : total >= max * .7 ? 'Wonderful spelling!' : 'Great practice!';
   $('#doneTitle').textContent = title;
   $('#doneScore').textContent = `⭐ ${total}`;
@@ -674,7 +732,191 @@ function endSpell() {
   const id = newRun();
   sayIf(id, `${title.replace('!', '')}${nameBit()}! You got ${perfect} out of ${S.results.length} on the first try, and earned ${total} stars!`, { rate: 0.95, pitch: 1.12 });
 }
+function doneExtra(label, fn) { const b = $('#doneExtra'); b.hidden = !label; if (label) { b.textContent = label; b.onclick = fn; } }
 function fillBee(sel) { const el = $(sel); el.innerHTML = beeSVG(); el.firstChild.style.width = 'clamp(90px,14vmin,140px)'; }
+
+/* ---------- BUILD IT ---------- */
+const DISTRACT = 'aeioubdmnprst';
+function startBuild(words) {
+  const L = activeList(); if (!L) return;
+  S = { mode: 'build', list: L, words: words ? shuffle(words) : pickWords(L, 8, false), i: 0, marks: [], results: [] };
+  show('build'); buildShow();
+}
+function buildShow() {
+  const w = S.words[S.i].w;
+  S.w = w; S.attempt = 1; S.busy = false;
+  S.slots = Array(w.length).fill(null);           // slot -> tray index
+  S.locked = Array(w.length).fill(false);
+  const extra = w.length <= 6 ? 2 : 1, letters = w.split('');
+  for (let k = 0; k < extra; k++) { let c; do { c = pick(DISTRACT.split('')); } while (w.includes(c)); letters.push(c); }
+  S.tray = shuffle(letters).map(c => ({ c, used: false }));
+  dots($('#buildDots'), S.words.length, S.i, S.marks);
+  $('#buildFeedback').textContent = ''; $('#buildFeedback').className = 'feedback';
+  $('#buildStars').innerHTML = '';
+  const s = S.words[S.i].s; $('#buildSentence').innerHTML = s ? blank(s, w) : '&nbsp;';
+  renderBuild();
+  [...$('#tray').children].forEach((t, k) => { t.classList.add('in'); t.style.animationDelay = (k * 0.05) + 's'; });
+  promptBuild();
+}
+async function promptBuild() {
+  const id = newRun(), w = S.words[S.i];
+  $('#buildSpeak').classList.add('talking');
+  await wait(250);
+  if (!await sayIf(id, w.w, { rate: 0.75 })) return;
+  if (w.s) { await wait(200); if (!await sayIf(id, w.s)) return; }
+  $('#buildSpeak').classList.remove('talking');
+}
+function renderBuild(extra = {}) {
+  const cur = S.slots.findIndex((v, k) => v == null && !S.locked[k]);
+  $('#buildSlots').innerHTML = S.w.split('').map((c, k) => {
+    const v = S.slots[k]; let cls = 'tile';
+    if (S.locked[k]) cls += ' lock'; if (k === cur) cls += ' cursor'; if (extra[k]) cls += ' ' + extra[k];
+    return `<div class="${cls}" data-k="${k}" style="--n:${S.w.length}">${v == null ? '' : S.tray[v].c}</div>`;
+  }).join('');
+  $('#tray').innerHTML = S.tray.map((t, k) => `<button class="ltile ${t.used ? 'used' : ''}" data-t="${k}">${t.c}</button>`).join('');
+}
+function buildPlace(t) {
+  if (!S || S.mode !== 'build' || S.busy || S.tray[t].used) return;
+  const k = S.slots.findIndex((v, i) => v == null && !S.locked[i]); if (k === -1) return;
+  actx(); sfx.tap(); say(LETTER[S.tray[t].c], { rate: 1.1 });
+  S.slots[k] = t; S.tray[t].used = true; renderBuild({ [k]: 'in' });
+  if (S.slots.every(v => v != null)) setTimeout(buildCheck, 350);
+}
+function buildRemove(k) {
+  if (!S || S.mode !== 'build' || S.busy || S.locked[k] || S.slots[k] == null) return;
+  sfx.del(); S.tray[S.slots[k]].used = false; S.slots[k] = null; renderBuild();
+}
+async function buildCheck() {
+  if (S.busy) return; S.busy = true;
+  const id = newRun(), w = S.words[S.i];
+  const guess = S.slots.map(v => S.tray[v].c).join('');
+  const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
+  const fb = $('#buildFeedback');
+  if (guess === w.w) {
+    const stars = S.attempt === 1 ? 3 : S.attempt === 2 ? 2 : 1;
+    // tiles are easier than typing: Build It can grow a word up to a bud, Spell It makes it bloom
+    if (S.attempt === 1 && r.b < 2) r.b++;
+    r.last = Date.now(); save();
+    S.marks[S.i] = 's' + stars; S.results.push({ w: w.w, stars });
+    const ok = {}; S.w.split('').forEach((_, k) => ok[k] = 'ok dance'); S.locked = S.locked.map(() => true); renderBuild(ok);
+    const praise = stars === 3 ? pick(P3) : stars === 2 ? pick(P2) : pick(P1);
+    fb.className = 'feedback good'; fb.textContent = praise;
+    $('#buildStars').innerHTML = Array.from({ length: stars }, (_, k) => `<span style="animation-delay:${k * .15}s">⭐</span>`).join('');
+    stars === 3 ? sfx.great() : sfx.good(); bumpHoney(stars);
+    if (stars === 3) { const rc = $('#buildSlots').getBoundingClientRect(); confetti(50, rc.left + rc.width / 2, rc.top + rc.height / 2); }
+    if (!await sayIf(id, praise.replace('!', '') + nameBit() + '!', { rate: 0.95, pitch: 1.15 })) return;
+    if (!await spellOut(id, w.w, k => { const t = $('#buildSlots').children[k]; t && (t.classList.remove('dance'), void t.offsetWidth, t.classList.add('dance')); })) return;
+    if (!await sayIf(id, w.w, { rate: 0.8 })) return;
+    await wait(400); if (id !== runId) return;
+    if (S.i < S.words.length - 1) { S.i++; buildShow(); } else endBuild();
+    return;
+  }
+  r.miss++; r.last = Date.now(); save(); sfx.soft();
+  const marks = {}; S.slots.forEach((v, k) => { if (!S.locked[k]) marks[k] = S.tray[v].c === S.w[k] ? 'ok' : 'no'; });
+  renderBuild(marks);
+  if (S.attempt < 2) {
+    const msg = pick(TRY);
+    fb.className = 'feedback try'; fb.textContent = msg + (Object.values(marks).includes('ok') ? ' Green letters are right!' : '');
+    await wait(900);
+    S.slots.forEach((v, k) => { if (S.locked[k]) return; if (S.tray[v].c === S.w[k]) S.locked[k] = true; else { S.tray[v].used = false; S.slots[k] = null; } });
+    S.attempt++; S.busy = false; renderBuild();
+    if (await sayIf(id, msg)) await sayIf(id, w.w, { rate: 0.7 });
+    return;
+  }
+  // second miss: the bee fixes it, letter by letter
+  await wait(700);
+  S.slots.forEach((v, k) => { if (!S.locked[k]) { S.tray[v].used = false; S.slots[k] = null; } });
+  renderBuild();
+  fb.className = 'feedback try'; fb.textContent = 'Let’s build it together!';
+  if (!await sayIf(id, `Let's build it together. ${w.w} is spelled`)) return;
+  for (let k = 0; k < S.w.length; k++) {
+    if (id !== runId) return;
+    if (!S.locked[k]) { const t = S.tray.findIndex(x => !x.used && x.c === S.w[k]); S.slots[k] = t; S.tray[t].used = true; S.locked[k] = true; }
+    renderBuild({ [k]: 'show in' }); sfx.tap();
+    await say(LETTER[S.w[k]], { rate: 1 });
+  }
+  const tip = tipFor(w.w);
+  if (tip) { fb.className = 'feedback tip'; fb.textContent = tip.show; if (!await sayIf(id, tip.say)) return; }
+  // let her build it once more on her own
+  S.slots = S.slots.map(() => null); S.locked = S.locked.map(() => false); S.tray.forEach(t => t.used = false);
+  S.attempt = 3; S.busy = false; renderBuild();
+  fb.className = 'feedback try'; fb.textContent = 'Now you build it!';
+  await sayIf(id, 'Now you build it!');
+}
+function endBuild() {
+  newRun();
+  const total = S.results.reduce((a, r) => a + r.stars, 0), perfect = S.results.filter(r => r.stars === 3).length;
+  show('done'); fillBee('#doneBee');
+  $('#doneTitle').textContent = perfect === S.results.length ? 'PERFECT BUILDING!' : 'Great building!';
+  $('#doneScore').textContent = `⭐ ${total}`;
+  $('#doneSub').textContent = `${perfect} of ${S.results.length} built on the first try. Now try spelling them without tiles!`;
+  $('#doneList').innerHTML = S.results.map(r => `<div class="res">${r.w} <span class="st">${'★'.repeat(r.stars)}</span></div>`).join('');
+  const words = S.words;
+  doneExtra('🧩 Build again', () => startBuild());
+  $('#doneNext').textContent = '✏️ Spell them!'; $('#doneNext').onclick = () => startSpell(words);
+  sfx.great(); confetti(120);
+  const id = newRun(); sayIf(id, `Great building${nameBit()}! Now let's spell them without the tiles.`, { rate: 0.95, pitch: 1.12 });
+}
+$('#buildSlots').addEventListener('pointerdown', e => { const t = e.target.closest('.tile'); if (t) buildRemove(+t.dataset.k); });
+$('#tray').addEventListener('pointerdown', e => { const t = e.target.closest('.ltile'); if (!t) return; e.preventDefault(); buildPlace(+t.dataset.t); });
+
+/* ---------- BEE CHALLENGE ---------- */
+let timerOn = store.get('timer', false), clockT0 = 0, clockIv = 0;
+const fmt = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+function startClock() { stopClock(); clockT0 = Date.now(); $('#clockNum').textContent = '0:00'; clockIv = setInterval(() => { $('#clockNum').textContent = fmt(Date.now() - clockT0); }, 500); }
+function stopClock() { clearInterval(clockIv); clockIv = 0; }
+function renderChIntro() {
+  const L = activeList(); if (!L) return;
+  const n = Math.min(20, L.words.length); $('#chCount').textContent = n;
+  $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
+  const best = (store.get('best', {}))[L.id];
+  $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') : '';
+}
+function openChallenge() { newRun(); renderChIntro(); show('chIntro'); const id = newRun(); sayIf(id, `Welcome to the Bee Challenge! No hints this time. You can do it${nameBit()}!`, { rate: 0.95, pitch: 1.12 }); }
+function startChallenge() {
+  const L = activeList(); if (!L) return;
+  S = { mode: 'challenge', list: L, words: shuffle(L.words).slice(0, 20), i: 0, marks: [], results: [] };
+  show('spell'); $('#clock').hidden = !timerOn; if (timerOn) startClock();
+  spellShow();
+}
+const CH_NEXT = ['Got it!', 'Next word!', 'Okay!', 'Here comes the next one!', 'Keep going!'];
+async function challengeCheck() {
+  S.busy = true; renderGo();
+  const id = newRun(), w = S.words[S.i], guess = S.typed.join(''), right = guess === w.w;
+  const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
+  if (right) { r.b = Math.min(5, r.b + 1); r.ok++; } else { r.b = Math.max(0, r.b - 1); r.miss++; }
+  r.last = Date.now(); save();
+  S.results.push({ w: w.w, guess, right }); S.marks[S.i] = 'seen';
+  // no right/wrong during the round, just like the real Bee
+  sfx.tap(); const msg = pick(CH_NEXT);
+  const fb = $('#spellFeedback'); fb.className = 'feedback tip'; fb.textContent = msg;
+  await sayIf(id, msg, { rate: 1 });
+  await wait(250); if (id !== runId) return;
+  if (S.i < S.words.length - 1) { S.i++; spellShow(); } else endChallenge();
+}
+function endChallenge() {
+  newRun(); stopClock();
+  const ms = timerOn ? Date.now() - clockT0 : 0;
+  const n = S.results.length, score = S.results.filter(r => r.right).length, misses = S.results.filter(r => !r.right);
+  const bests = store.get('best', {}), prev = bests[S.list.id];
+  const record = !prev || score > prev.score || (score === prev.score && ms && (!prev.ms || ms < prev.ms));
+  if (record) { bests[S.list.id] = { score, n, ms }; store.set('best', bests); }
+  const today = dayKey(0);
+  if (streak.last !== today) { streak.n = streak.last === dayKey(-1) ? streak.n + 1 : 1; streak.last = today; }
+  const earned = score * 3 + (score === n ? 10 : 0);
+  save(); show('done'); fillBee('#doneBee'); bumpHoney(earned); renderHeader();
+  const title = score === n ? '🏆 BEE CHAMPION!' : score >= n * .8 ? 'Amazing spelling!' : score >= n * .5 ? 'Great job!' : 'Good practice!';
+  $('#doneTitle').textContent = title;
+  $('#doneScore').textContent = `${score} / ${n}`;
+  $('#doneSub').textContent = (record && prev ? 'New record! ' : '') + (ms ? `Time: ${fmt(ms)}. ` : '') + `You earned ${earned} honey drops! 🍯` + (misses.length ? ' Words to practice:' : '');
+  $('#doneList').innerHTML = misses.map(r => `<div class="res miss">${r.guess} → <span class="fix">${r.w}</span></div>`).join('');
+  if (misses.length) doneExtra('✏️ Practice my misses', () => startSpell(misses.map(m => S.list.words.find(x => x.w === m.w))));
+  else doneExtra(null);
+  $('#doneNext').textContent = '🏆 Try again'; $('#doneNext').onclick = () => openChallenge();
+  score === n ? (sfx.great(), confetti(320)) : (sfx.good(), confetti(score >= n * .8 ? 160 : 60));
+  const id = newRun();
+  sayIf(id, `${title.replace(/[^a-zA-Z ]/g, '').trim()}${nameBit()}! You spelled ${score} out of ${n} words correctly${record && prev ? ', a new record' : ''}!`, { rate: 0.95, pitch: 1.12 });
+}
 
 /* ---------- keyboard ---------- */
 function buildKB() {
@@ -686,7 +928,7 @@ function buildKB() {
     const k = b.dataset.k; if (k === 'del') backspace(); else if (k === 'go') check(); else typeLetter(k);
   });
   document.addEventListener('keydown', e => {
-    if (!S || S.mode !== 'spell' || !$('#spell').classList.contains('on')) return;
+    if (!typing() || !$('#spell').classList.contains('on')) return;
     if (/^[a-z]$/i.test(e.key)) typeLetter(e.key.toLowerCase());
     else if (e.key === 'Backspace') backspace();
     else if (e.key === 'Enter') check();
@@ -744,10 +986,16 @@ function renderSetup() {
 function openSetup() { newRun(); renderSetup(); show('setup'); }
 
 /* ---------- wire up ---------- */
-function goHome() { newRun(); S = null; show('home'); renderHome(); }
+function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome(); }
 $('#homeBtn').onclick = goHome;
 $('#learnBtn').onclick = () => { actx(); sfx.tap(); startLearn(); };
 $('#spellBtn').onclick = () => { actx(); sfx.tap(); startSpell(); };
+$('#buildBtn').onclick = () => { actx(); sfx.tap(); startBuild(); };
+$('#challengeBtn').onclick = () => { actx(); sfx.tap(); openChallenge(); };
+$('#buildSpeak').onclick = () => { if (S && S.mode === 'build' && !S.busy) promptBuild(); };
+$('#timerToggle').onclick = () => { timerOn = !timerOn; store.set('timer', timerOn); sfx.tap(); renderChIntro(); };
+$('#chStart').onclick = () => { actx(); sfx.tap(); startChallenge(); };
+$('#chBack').onclick = goHome;
 $('#learnSpeak').onclick = () => { if (!S) return; const id = newRun(); $('#learnSpeak').classList.add('talking'); sayIf(id, S.words[S.i].w, { rate: 0.75 }).then(() => $('#learnSpeak').classList.remove('talking')); };
 $('#learnAgain').onclick = () => learnShow();
 $('#learnNext').onclick = learnNext;
