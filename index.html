@@ -217,6 +217,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .theme-card .e{display:block;font-size:clamp(34px,calc(var(--h,100vh)*.08),64px);line-height:1.15}
 .theme-card.on{box-shadow:0 0 0 5px var(--honey),0 6px 0 rgba(43,45,66,.2)}
 .theme-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.theme-pills .list-pill[disabled]{opacity:.55;cursor:default}
 .theme-pills .list-pill{font-size:clamp(16px,2.4vmin,20px);padding:8px 14px}
 .round-tabs{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:1.2vh}
 .round-tab{border:0;border-radius:18px;padding:8px 20px;font:inherit;font-weight:600;font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);line-height:1.15;cursor:pointer;
@@ -238,11 +239,14 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 @keyframes sad{0%,100%{transform:translateY(8px) rotate(-2deg)}50%{transform:translateY(10px) rotate(2deg)}}
 .player-chip{border:0;font-family:inherit;color:var(--ink);cursor:pointer;padding:6px 16px;max-width:30vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .who-list{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-height:calc(var(--h,100vh)*.3);overflow:auto;padding:6px}
-.who-item{position:relative}
-.who-pick{border:0;border-radius:20px;background:var(--honey);color:#5a3500;font:inherit;font-weight:600;font-size:clamp(22px,calc(var(--h,100vh)*.04),32px);padding:12px 44px 12px 26px;box-shadow:0 6px 0 var(--honey2);cursor:pointer}
-.who-del{position:absolute;top:50%;right:8px;width:30px;height:30px;margin-top:-18px;border:0;border-radius:50%;background:rgba(255,255,255,.75);color:#5a3500;font-size:16px;cursor:pointer}
+.who-pick{border:0;border-radius:20px;background:var(--honey);color:#5a3500;font:inherit;font-weight:600;font-size:clamp(22px,calc(var(--h,100vh)*.04),32px);padding:12px 26px;box-shadow:0 6px 0 var(--honey2);cursor:pointer}
 .who-new{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
 .who-new input{font:inherit;font-size:clamp(20px,calc(var(--h,100vh)*.034),28px);padding:12px 18px;border-radius:18px;border:3px solid #e3e6ef;min-width:min(320px,70vw);-webkit-user-select:text;user-select:text}
+.report{width:100%;border-collapse:collapse;font-size:17px;margin:6px 0}
+.report th,.report td{padding:4px 10px;text-align:left;border-bottom:1px solid #e3e6ef}
+.report td.n,.report th.n{text-align:right;font-variant-numeric:tabular-nums}
+#report details{background:#f6f3fb;border-radius:12px;padding:8px 12px;margin-bottom:8px}
+#report summary{font-weight:600;font-size:17px;cursor:pointer}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -332,7 +336,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="chip" id="honeyChip" title="Honey"><span class="ic">🍯</span><span id="honeyNum">0</span></div>
     <div class="chip" id="streakChip" title="Days in a row"><span class="ic">🔥</span><span id="streakNum">0</span></div>
     <div class="spacer"></div>
-    <button class="chip player-chip" id="playerChip" aria-label="Change player">🔄 <span id="playerNameChip"></span></button>
+    <div class="chip player-chip" id="playerChip">👤 <span id="playerNameChip"></span></div>
     <div class="chip" id="listChip"><span class="ic">📚</span><span id="listName">No words yet</span></div>
     <button class="iconbtn" id="themeBtn" aria-label="Pick a theme">🎨</button>
     <button class="iconbtn" id="gearBtn" aria-label="Grown-ups corner">⚙️</button>
@@ -363,7 +367,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
         <button class="btn pink" id="learnBtn"><span class="em">👂</span><span>Listen &amp; Learn<small>Hear it, see it, say it</small></span></button>
         <button class="btn" id="buildBtn"><span class="em">🧩</span><span>Build It<small>Put the letter tiles in order</small></span></button>
         <button class="btn green" id="spellBtn"><span class="em">✏️</span><span>Spell It!<small>Hear the word, spell it yourself</small></span></button>
-        <button class="btn honey" id="challengeBtn"><span class="em">🏆</span><span>Bee Challenge<small>20 words, no hints, like the real Bee</small></span></button>
+        <button class="btn honey" id="challengeBtn"><span class="em">🏆</span><span>Bee Challenge<small>5 levels, 20 words each, no hints</small></span></button>
       </div>
     </div>
     <div class="meadow">
@@ -459,6 +463,14 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <section class="screen" id="setup">
     <div class="card">
       <div class="row" style="justify-content:space-between"><h2>⚙️ Grown-ups corner</h2><button class="btn honey small" id="setupDone">Done ✓</button></div>
+      <h2 style="font-size:22px">📊 Report card</h2>
+      <div class="list-pick" id="reportWho"></div>
+      <div id="report"></div>
+      <div class="row">
+        <button class="btn ghost small" id="startOver"></button>
+        <button class="btn ghost small" id="removePlayer"></button>
+        <button class="btn ghost small" id="changePlayer">🔄 Change player</button>
+      </div>
       <h2 style="font-size:22px">Word lists</h2>
       <p>Words stay on this device only. One word per line, with an optional sentence after a bar:
         <code>kite | My kite flew up high.</code> Tag each list with a line above its words: <code># Medium Girl</code>, <code># Big Girl</code>, or a new name like <code># Week 12</code>. One file can hold them all.
@@ -475,7 +487,6 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
       <div id="progressBox"></div>
       <div class="row">
         <button class="btn ghost small" id="deleteList">🗑️ Remove this list</button>
-        <button class="btn ghost small" id="resetProg">↺ Reset its progress</button>
       </div>
     </div>
   </section>
@@ -503,6 +514,7 @@ let activeId = store.get('active', null);
 // each player has their own progress, honey, streak, best scores and level
 let progress = {};                           // {listId:{word:{b,seen,ok,miss,last}}}
 let honey = 0, streak = { last: null, n: 0 }, bests = {}, player = '';
+let stats = {}, rounds = [], chLevel = 1;      // stats {word:{r,w}}, rounds [{lvl,score,n,t}]: kept until Start over
 const pKey = n => 'p.' + n.trim().toLowerCase();
 let players = store.get('players', null);
 if (players == null) {                       // first run after this update: keep what's on the device
@@ -523,12 +535,12 @@ const activeList = () => lists.find(l => l.id === activeId) || lists[0] || null;
 const prog = id => (progress[id] = progress[id] || {});
 const save = () => {
   store.set('lists', lists); store.set('active', activeId); store.set('players', players);
-  if (player) store.set(pKey(player), { progress, honey, streak, best: bests, active: activeId });
+  if (player) store.set(pKey(player), { progress, honey, streak, best: bests, active: activeId, stats, rounds, level: chLevel });
 };
 function loadPlayer(name) {
   player = name;
   const d = store.get(pKey(name), {});
-  progress = d.progress || {}; honey = d.honey || 0; streak = d.streak || { last: null, n: 0 }; bests = d.best || {};
+  progress = d.progress || {}; honey = d.honey || 0; streak = d.streak || { last: null, n: 0 }; bests = d.best || {}; stats = d.stats || {}; rounds = d.rounds || []; chLevel = d.level || 1;
   if (d.active && lists.some(l => l.id === d.active)) activeId = d.active;
   if (!players.some(n => pKey(n) === pKey(name))) players.push(name);
   save();
@@ -932,7 +944,8 @@ async function check() {
   if (S.mode === 'challenge') return challengeCheck();
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join('');
-  const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
+  const P = prog(w.lid || S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
+  if (S.attempt === 1 && !S.copy) tally(w.w, guess === w.w);   // first try is the fair count
   if (guess === w.w) {
     let stars = S.copy ? 1 : S.attempt === 1 ? 3 : 2;
     if (S.attempt === 1 && !S.copy) { r.b = Math.min(5, r.b + 1); r.ok++; }
@@ -1018,6 +1031,8 @@ function doneExtra(label, fn) { const b = $('#doneExtra'); b.hidden = !label; if
 function toast(text) { const t = $('#toast'); t.hidden = true; void t.offsetWidth; t.textContent = text; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 1300); }
 function fillBee(sel) { $('#podium').hidden = true; const el = $(sel); el.innerHTML = beeSVG(); el.firstChild.style.width = 'clamp(90px,14vmin,140px)'; }
 
+function tally(word, ok) { const t = stats[word] = stats[word] || { r: 0, w: 0 }; ok ? t.r++ : t.w++; }
+
 /* ---------- BUILD IT ---------- */
 const DISTRACT = 'aeioubdmnprst';
 function startBuild(words) {
@@ -1081,6 +1096,7 @@ async function buildCheck() {
   const guess = S.slots.map(v => S.tray[v].c).join('');
   const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
   const fb = $('#buildFeedback');
+  if (S.attempt === 1) tally(w.w, guess === w.w);
   if (guess === w.w) {
     const stars = S.attempt === 1 ? 3 : S.attempt === 2 ? 2 : 1;
     // tiles are easier than typing: Build It can grow a word up to a bud, Spell It makes it bloom
@@ -1156,22 +1172,39 @@ let timerOn = store.get('timer', false), clockT0 = 0, clockIv = 0;
 const fmt = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 function startClock() { stopClock(); clockT0 = Date.now(); $('#clockNum').textContent = '0:00'; clockIv = setInterval(() => { $('#clockNum').textContent = fmt(Date.now() - clockT0); }, 500); }
 function stopClock() { clearInterval(clockIv); clockIv = 0; }
+/* Bee Challenge levels: 1-2 Medium Girl, 3 mixed, 4-5 Big Girl. The word set in each is fixed. */
+const RL = ['garden', 'castle', 'kolkata', 'christmas', 'halloween'], PASS = 0.8;
+function levelSets() {
+  const M = lists.find(l => l.id === '1st-grade-bee'), B = lists.find(l => l.id === '2nd-grade-bee');
+  if (!M || !B) return null;
+  const m = M.words.map(w => ({ ...w, lid: M.id })), b = B.words.map(w => ({ ...w, lid: B.id }));
+  return [m.slice(0, 20), m.slice(20, 40), m.slice(40).concat(b.slice(0, 10)), b.slice(10, 30), b.slice(30, 50)];
+}
+const levelMode = () => { const L = activeList(); return !!(L && LEVELS[L.id] && levelSets()); };
+const passed = (n, b = bests) => { const x = b['L' + n]; return !!x && x.score / x.n >= PASS; };
+const unlocked = (n, b = bests) => n === 1 || passed(n - 1, b);
 function renderChIntro() {
   const L = activeList(); if (!L) return;
-  $('#chIcon').textContent = theme === 'garden' ? '🏆' : T().icon;
-  $('#chTitle').textContent = theme === 'garden' ? 'Bee Challenge' : `${T().name} Round`;
-  $('#chThemes').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="list-pill ${k === theme ? 'on' : ''}" data-t="${k}">${t.icon} ${t.name}</button>`).join('');
+  const lv = levelMode();
+  $('#chIcon').textContent = lv ? T().icon : theme === 'garden' ? '🏆' : T().icon;
+  $('#chTitle').textContent = lv ? `Level ${chLevel}: ${T().name}` : theme === 'garden' ? 'Bee Challenge' : `${T().name} Round`;
+  $('#chThemes').innerHTML = lv ? RL.map((k, i) => { const n = i + 1, open = unlocked(n); return `<button class="list-pill ${n === chLevel ? 'on' : ''}" data-l="${n}" ${open ? '' : 'disabled'}>${open ? (passed(n) ? '⭐' : THEMES[k].icon) : '🔒'} Level ${n}</button>`; }).join('')
+    : Object.entries(THEMES).map(([k, t]) => `<button class="list-pill ${k === theme ? 'on' : ''}" data-t="${k}">${t.icon} ${t.name}</button>`).join('');
   const n = Math.min(20, L.words.length); $('#chCount').textContent = n; $('#chWords').textContent = n === 1 ? 'word' : 'words';
-  $('#chRounds').innerHTML = lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}</button>`).join('') : '';
+  $('#chRounds').innerHTML = !lv && lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}</button>`).join('') : '';
   $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
-  const best = bests[L.id];
-  $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') : '';
+  const best = bests[lv ? 'L' + chLevel : L.id], need = Math.ceil(n * PASS);
+  $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') + (lv && chLevel < 5 && !unlocked(chLevel + 1) ? ` · Get ${need} to unlock Level ${chLevel + 1}` : '') : (lv && chLevel < 5 ? `Get ${need} of ${n} to unlock Level ${chLevel + 1}` : '');
 }
-function roundName() { return theme === 'garden' ? 'the Bee Challenge' : `the ${T().name} round`; }
-function openChallenge() { newRun(); renderChIntro(); show('chIntro'); const id = newRun(); sayIf(id, `Welcome to ${roundName()}! No hints this time. You can do it${nameBit()}!`, { rate: 0.95, pitch: 1.12 }); }
+function roundName() { return levelMode() ? `level ${chLevel}` : theme === 'garden' ? 'the Bee Challenge' : `the ${T().name} round`; }
+function openChallenge() {
+  if (levelMode()) { if (!unlocked(chLevel)) chLevel = 1; setTheme(RL[chLevel - 1]); }
+  newRun(); renderChIntro(); show('chIntro'); const id = newRun(); sayIf(id, `Welcome to ${roundName()}! No hints this time. You can do it${nameBit()}!`, { rate: 0.95, pitch: 1.12 });
+}
 function startChallenge() {
   const L = activeList(); if (!L) return;
-  S = { mode: 'challenge', list: L, words: shuffle(L.words).slice(0, 20), i: 0, marks: [], results: [] };
+  const lv = levelMode();
+  S = { mode: 'challenge', list: L, level: lv ? chLevel : 0, words: shuffle(lv ? levelSets()[chLevel - 1] : L.words).slice(0, 20), i: 0, marks: [], results: [] };
   show('spell'); $('#clock').hidden = !timerOn; if (timerOn) startClock();
   $('#scoreDone').hidden = $('#scoreRight').hidden = false; renderScore();
   spellShow();
@@ -1186,7 +1219,8 @@ function renderScore() {
 async function challengeCheck() {
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join(''), right = guess === w.w;
-  const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
+  const P = prog(w.lid || S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
+  tally(w.w, right);
   if (right) { r.b = Math.min(5, r.b + 1); r.ok++; } else { r.b = Math.max(0, r.b - 1); r.miss++; }
   r.last = Date.now(); save();
   S.results.push({ w: w.w, guess, right }); S.marks[S.i] = right ? 's3' : 'seen';
@@ -1233,9 +1267,11 @@ function endChallenge() {
   newRun(); stopClock();
   const ms = timerOn ? Date.now() - clockT0 : 0;
   const n = S.results.length, score = S.results.filter(r => r.right).length, misses = S.results.filter(r => !r.right);
-  const prev = bests[S.list.id];
+  const key = S.level ? 'L' + S.level : S.list.id, prev = bests[key], next = S.level && S.level < 5 ? S.level + 1 : 0, wasOpen = next && unlocked(next);
   const record = !prev || score > prev.score || (score === prev.score && ms && (!prev.ms || ms < prev.ms));
-  if (record) { bests[S.list.id] = { score, n, ms }; }
+  if (record) { bests[key] = { score, n, ms }; }
+  rounds.push({ lvl: S.level, score, n, t: Date.now() }); if (rounds.length > 300) rounds.shift();
+  const opened = next && !wasOpen && unlocked(next), nowOpen = next && unlocked(next);
   const today = dayKey(0);
   if (streak.last !== today) { streak.n = streak.last === dayKey(-1) ? streak.n + 1 : 1; streak.last = today; }
   const earned = score * 3 + (score === n ? 10 : 0);
@@ -1245,24 +1281,30 @@ function endChallenge() {
   save(); show('done'); fillBee('#doneBee'); $('#doneBee').innerHTML = ''; bumpHoney(earned); renderHeader();
   $('#doneTitle').textContent = `${out.icon} ${out.title}`;
   $('#doneScore').textContent = `${score} / ${n}`;
-  $('#doneSub').textContent = (record && prev ? 'New record! ' : '') + (ms ? `Time: ${fmt(ms)}. ` : '') + `+${earned} honey 🍯` + (misses.length ? ' · Words to practice:' : '');
+  const lvlNote = opened ? `🔓 Level ${next} is unlocked!` : next && !nowOpen ? `Get ${Math.ceil(n * PASS)} to unlock Level ${next}.` : '';
+  $('#doneSub').textContent = (lvlNote ? lvlNote + ' ' : '') + (record && prev ? 'New record! ' : '') + (ms ? `Time: ${fmt(ms)}. ` : '') + `+${earned} honey 🍯` + (misses.length ? ' · Words to practice:' : '');
   $('#doneList').innerHTML = misses.map(r => `<div class="res miss">${r.guess} → <span class="fix">${r.w}</span></div>`).join('');
   renderPodium(table);
-  if (misses.length) doneExtra('✏️ Practice my misses', () => startSpell(misses.map(m => S.list.words.find(x => x.w === m.w))));
+  if (misses.length) { const missed = misses.map(m => S.words.find(x => x.w === m.w)); doneExtra('✏️ Practice my misses', () => startSpell(missed)); }
   else doneExtra(null);
-  $('#doneNext').textContent = '🏆 Try again'; $('#doneNext').onclick = () => openChallenge();
+  if (nowOpen) { $('#doneNext').textContent = `➜ Level ${next}`; $('#doneNext').onclick = () => { chLevel = next; save(); openChallenge(); }; }
+  else { $('#doneNext').textContent = '🏆 Try again'; $('#doneNext').onclick = () => openChallenge(); }
   // big outcome toast over the results
   $('#btIcon').textContent = out.icon; $('#btTitle').textContent = out.title;
-  $('#btSub').textContent = `${score} out of ${n} correct. ${out.sub}`;
+  $('#btSub').textContent = `${score} out of ${n} correct. ${opened ? lvlNote : out.sub}`;
   $('#bigToast').hidden = false;
   rank === 0 ? (sfx.great(), confetti(320)) : rank <= 2 ? (sfx.great(), confetti(160)) : sfx.good();
   const id = newRun();
-  sayIf(id, `${out.title.replace(/[^a-zA-Z' ]/g, '')}${nameBit()}! You spelled ${score} out of ${n} words correctly.${record && prev ? ' A new record!' : ''}`, { rate: 0.95, pitch: 1.12 });
+  sayIf(id, `${out.title.replace(/[^a-zA-Z' ]/g, '')}${nameBit()}! You spelled ${score} out of ${n} words correctly.${opened ? ` Level ${next} is unlocked!` : record && prev ? ' A new record!' : ''}`, { rate: 0.95, pitch: 1.12 });
 }
 function renderThemes() { $('#themeGrid').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="theme-card ${k === theme ? 'on' : ''}" data-t="${k}" style="background:${t.bg}"><span class="e">${t.icon}</span>${t.name}</button>`).join(''); }
 $('#themeGrid').onclick = e => { const b = e.target.closest('.theme-card'); if (!b) return; actx(); sfx.bloom(); setTheme(b.dataset.t); renderThemes(); };
 $('#chRounds').onclick = e => { const b = e.target.closest('.round-tab'); if (!b) return; actx(); sfx.bloom(); activeId = b.dataset.id; save(); renderHeader(); renderChIntro(); };
-$('#chThemes').onclick = e => { const b = e.target.closest('.list-pill'); if (!b) return; actx(); sfx.bloom(); setTheme(b.dataset.t); renderChIntro(); };
+$('#chThemes').onclick = e => {
+  const b = e.target.closest('.list-pill'); if (!b || b.disabled) return; actx(); sfx.bloom();
+  if (b.dataset.l) { chLevel = +b.dataset.l; save(); setTheme(RL[chLevel - 1]); } else setTheme(b.dataset.t);
+  renderChIntro();
+};
 $('#themeBtn').onclick = () => { newRun(); stopClock(); S = null; actx(); sfx.tap(); renderThemes(); show('themes'); };
 $('#btOk').onclick = () => { $('#bigToast').hidden = true; newRun(); sfx.tap(); };
 
@@ -1325,13 +1367,44 @@ function renderSetup() {
   renderHeader();
 }
 
-function openSetup() { newRun(); renderSetup(); show('setup'); }
+let reportName = '';
+function renderReport() {
+  if (!players.includes(reportName)) reportName = player || players[0] || '';
+  $('#reportWho').innerHTML = players.map(n => `<button class="list-pill ${n === reportName ? 'on' : ''}" data-n="${esc(n)}">${esc(n)}</button>`).join('');
+  $('#startOver').textContent = `↺ Start over for ${reportName}`; $('#removePlayer').textContent = `🗑️ Remove ${reportName}`;
+  const d = store.get(pKey(reportName), {}), st = d.stats || {}, bs = d.best || {}, log = d.rounds || [], sets = levelSets();
+  const table = words => {
+    const rows = words.map(w => ({ w, r: (st[w] || {}).r || 0, x: (st[w] || {}).w || 0 })).sort((a, b) => b.x - a.x || b.r - a.r || (a.w < b.w ? -1 : 1));
+    return `<table class="report"><tr><th>Word</th><th class="n">✅ Right</th><th class="n">❌ Wrong</th></tr>${rows.map(o => `<tr><td>${esc(o.w)}</td><td class="n">${o.r}</td><td class="n">${o.x}</td></tr>`).join('')}</table>`;
+  };
+  let h = '', seen = new Set();
+  (sets || []).forEach((set, i) => {
+    const n = i + 1, b = bs['L' + n], plays = log.filter(r => r.lvl === n).length, right = set.filter(w => (st[w.w] || {}).r).length, wrong = set.reduce((a, w) => a + ((st[w.w] || {}).w || 0), 0);
+    set.forEach(w => seen.add(w.w));
+    h += `<details><summary>${unlocked(n, bs) ? THEMES[RL[i]].icon : '🔒'} Level ${n}: best ${b ? `${b.score}/${b.n}` : 'not played'} · played ${plays}× · ${right}/${set.length} words right at least once · ${wrong} misses</summary>${table(set.map(w => w.w))}</details>`;
+  });
+  const other = Object.keys(st).filter(w => !seen.has(w));
+  if (other.length) h += `<details><summary>Other words: ${other.length}</summary>${table(other)}</details>`;
+  $('#report').innerHTML = h || '<p>No words loaded yet.</p>';
+}
+function openSetup() { newRun(); save(); reportName = player; renderSetup(); renderReport(); show('setup'); }
+$('#reportWho').onclick = e => { const b = e.target.closest('.list-pill'); if (b) { reportName = b.dataset.n; renderReport(); } };
+$('#startOver').onclick = () => {
+  const n = reportName; if (!n || !confirm(`Start over for ${n}? This clears all progress, honey, levels and the report card. It can’t be undone.`)) return;
+  store.set(pKey(n), {}); if (n === player) loadPlayer(n); renderSetup(); renderReport();
+};
+$('#removePlayer').onclick = () => {
+  const n = reportName; if (!n || !confirm(`Remove ${n} and all of their progress? It can’t be undone.`)) return;
+  players = players.filter(x => x !== n); try { localStorage.removeItem('sg.' + pKey(n)); } catch {} store.set('players', players);
+  if (n === player) goWho(); else { reportName = player; renderReport(); }
+};
+$('#changePlayer').onclick = () => { sfx.tap(); save(); goWho(); };
 
 /* ---------- wire up ---------- */
 function goWho() {
-  newRun(); stopClock(); S = null; player = ''; progress = {}; honey = 0; bests = {};
+  newRun(); stopClock(); S = null; player = ''; progress = {}; honey = 0; bests = {}; stats = {}; rounds = [];
   $('#whoName').value = ''; $('#whoBee').innerHTML = beeSVG();
-  $('#whoList').innerHTML = players.map(n => `<div class="who-item"><button type="button" class="who-pick" data-n="${esc(n)}">${esc(n)}</button><button type="button" class="who-del" data-n="${esc(n)}" aria-label="Remove ${esc(n)}">✕</button></div>`).join('');
+  $('#whoList').innerHTML = players.map(n => `<button type="button" class="who-pick" data-n="${esc(n)}">${esc(n)}</button>`).join('');
   show('who');
 }
 function startPlayer(name) {
@@ -1342,13 +1415,8 @@ function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome();
 $('#homeBtn').onclick = goHome;
 $('#gearBtn').onclick = () => { sfx.tap(); openSetup(); };
 $('#loadHint').onclick = () => { sfx.tap(); openSetup(); };
-$('#playerChip').onclick = () => { sfx.tap(); goWho(); };
 $('#whoForm').onsubmit = e => { e.preventDefault(); const n = $('#whoName').value.trim(); if (n) { $('#whoName').blur(); startPlayer(players.find(x => pKey(x) === pKey(n)) || n); } else $('#whoName').focus(); };
-$('#whoList').onclick = e => {
-  const del = e.target.closest('.who-del'), go = e.target.closest('.who-pick');
-  if (del) { const n = del.dataset.n; if (!confirm(`Remove ${n} and all of their progress?`)) return; players = players.filter(x => x !== n); try { localStorage.removeItem('sg.' + pKey(n)); } catch {} store.set('players', players); goWho(); }
-  else if (go) startPlayer(go.dataset.n);
-};
+$('#whoList').onclick = e => { const go = e.target.closest('.who-pick'); if (go) startPlayer(go.dataset.n); };
 $('#roundTabs').onclick = e => { const b = e.target.closest('.round-tab'); if (!b || b.dataset.id === activeId) return; actx(); sfx.bloom(); activeId = b.dataset.id; save(); renderHome(); };
 $('#learnBtn').onclick = () => { actx(); sfx.tap(); startLearn(); };
 $('#spellBtn').onclick = () => { actx(); sfx.tap(); startSpell(); };
@@ -1368,7 +1436,6 @@ $('#importBtn').onclick = () => doImport($('#importText').value);
 $('#importFile').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(doImport); e.target.value = ''; };
 $('#listPick').onclick = e => { const b = e.target.closest('.list-pill'); if (!b) return; activeId = b.dataset.id; save(); renderSetup(); };
 $('#deleteList').onclick = () => { const L = activeList(); if (!L || !confirm(`Remove “${L.name}”? Its progress is deleted too.`)) return; lists = lists.filter(l => l.id !== L.id); delete progress[L.id]; activeId = lists[0] ? lists[0].id : null; save(); renderSetup(); };
-$('#resetProg').onclick = () => { const L = activeList(); if (!L || !confirm(`Reset all progress for “${L.name}”?`)) return; progress[L.id] = {}; save(); renderSetup(); };
 $('#setupDone').onclick = goHome;
 
 addEventListener('resize', () => { if ($('#home').classList.contains('on')) renderHome(); });
