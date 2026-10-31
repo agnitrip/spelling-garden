@@ -21,7 +21,20 @@
   --honey:#ffb627; --honey2:#f08c00; --ink:#2b2d42; --soft:#5c6078; --card:#fffdf6;
   --good:#22b573; --good2:#178a57; --bad:#ff6b6b; --hint:#ff9f1c; --violet:#8e6cff; --violet2:#6a48e0;
   --pink:#ff7eb6; --pink2:#e0569a;
+  --hill1:#5fb843; --hill2:#86d65f; --hill3a:#9be16f; --hill3b:#86d65f;
+  --sub:#24527a; --meadow-bg:rgba(255,255,255,.35); --meadow-ink:#1f4d2b; --ring:transparent; --card-t:#fffdf6; --deco:"";
 }
+html[data-theme=castle]{--sky1:#3b1f7a;--sky2:#d67fc4;--hill1:#7a4fc4;--hill2:#9a6fe0;--hill3a:#c79bf0;--hill3b:#a97fe8;
+  --sub:#fff0fb;--meadow-bg:rgba(255,255,255,.72);--meadow-ink:#4a2a8a;--ring:#c79bf0;--card-t:#fdf6ff;--deco:"✨"}
+html[data-theme=kolkata]{--sky1:#f08a3c;--sky2:#ffd9a0;--hill1:#2f7f8f;--hill2:#2f7f8f;--hill3a:#3f9aaa;--hill3b:#2f7f8f;
+  --sub:#5a2500;--meadow-bg:rgba(255,255,255,.72);--meadow-ink:#5a2500;--ring:#ffc21a;--card-t:#fffaf0;--deco:"🚕"}
+html[data-theme=christmas]{--sky1:#0d2350;--sky2:#2f5f9e;--hill1:#dce9f5;--hill2:#eef5fb;--hill3a:#ffffff;--hill3b:#e6f0f8;
+  --sub:#e6f3ff;--meadow-bg:rgba(255,255,255,.78);--meadow-ink:#13406b;--ring:#d62839;--card-t:#fffdf8;--deco:"🎄"}
+html[data-theme=halloween]{--sky1:#1a0b2e;--sky2:#6a2c91;--hill1:#2a1a3e;--hill2:#3a2452;--hill3a:#4a2f63;--hill3b:#3a2452;
+  --sub:#ffd9a8;--meadow-bg:rgba(255,255,255,.72);--meadow-ink:#4a1f6b;--ring:#ff7a18;--card-t:#fff8ef;--deco:"🎃"}
+html[data-theme=castle] .cloud,html[data-theme=christmas] .cloud,html[data-theme=halloween] .cloud{display:none}
+html[data-theme=castle] .sun,html[data-theme=christmas] .sun{background:radial-gradient(circle,#fff 0%,#fdf6d0 70%,#f2e7b0 100%);box-shadow:0 0 50px 12px rgba(255,250,210,.45)}
+html[data-theme=halloween] .sun{width:26vmin;height:26vmin;background:radial-gradient(circle,#ffd27a 0%,#ff9d2e 65%,#f07a12 100%);box-shadow:0 0 70px 24px rgba(255,140,40,.5)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;overflow:hidden}
@@ -46,9 +59,9 @@ body{
 @keyframes drift{to{transform:translateX(150vw)}}
 @keyframes pulse{50%{transform:scale(1.06)}}
 .hill{position:absolute;border-radius:50%}
-.h1{width:120vw;height:50vh;left:-30vw;bottom:-30vh;background:var(--grass2)}
-.h2{width:110vw;height:46vh;right:-35vw;bottom:-28vh;background:var(--grass)}
-.h3{width:160vw;height:40vh;left:-30vw;bottom:-29vh;background:linear-gradient(180deg,#9be16f,var(--grass))}
+.h1{width:120vw;height:50vh;left:-30vw;bottom:-30vh;background:var(--hill1)}
+.h2{width:110vw;height:46vh;right:-35vw;bottom:-28vh;background:var(--hill2)}
+.h3{width:160vw;height:40vh;left:-30vw;bottom:-29vh;background:linear-gradient(180deg,var(--hill3a),var(--hill3b))}
 
 /* layout */
 #app{position:relative;z-index:1;height:var(--h,100vh);display:flex;flex-direction:column;
@@ -91,7 +104,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 /* home */
 .title{font-weight:700;font-size:clamp(40px,7.5vmin,84px);color:#fff;margin:1vh 0 0;letter-spacing:.5px;
   text-shadow:0 4px 0 var(--honey2),0 8px 18px rgba(0,0,0,.18);-webkit-text-stroke:2px var(--honey2)}
-.subtitle{font-size:clamp(18px,2.6vmin,28px);color:#24527a;margin:.4vh 0 0;font-weight:500}
+.subtitle{font-size:clamp(18px,2.6vmin,28px);color:var(--sub);margin:.4vh 0 0;font-weight:500}
 .home-row{display:flex;align-items:center;gap:3vw;margin-top:2vh}
 .bee{width:clamp(110px,18vmin,190px);animation:bob 2.4s ease-in-out infinite}
 .bee .wing{transform-origin:60px 40px;animation:flap .18s ease-in-out infinite alternate}
@@ -102,15 +115,15 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .mode-btns .btn small{display:block;font-size:.5em;font-weight:500;opacity:.9}
 .mode-btns .btn .em{font-size:1.4em}
 
-.meadow{margin-top:auto;width:min(1000px,100%);background:rgba(255,255,255,.35);border-radius:28px;
+.meadow{margin-top:auto;width:min(1000px,100%);background:var(--meadow-bg);border-radius:28px;
   padding:12px 16px 10px;backdrop-filter:blur(2px)}
-.meadow-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#1f4d2b;
+.meadow-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:var(--meadow-ink);
   font-size:clamp(16px,2.2vmin,22px);margin-bottom:4px}
 .garden{display:grid;grid-template-columns:repeat(var(--cols,10),1fr);gap:2px;justify-items:center}
 .garden svg{width:100%;max-width:var(--cw,58px);height:auto;display:block}
 .garden svg.pop{animation:grow .8s cubic-bezier(.3,1.6,.5,1)}
 @keyframes grow{from{transform:scale(.2) translateY(30%)}}
-.empty-note{padding:18px;text-align:center;font-size:clamp(18px,2.4vmin,24px);color:#1f4d2b}
+.empty-note{padding:18px;text-align:center;font-size:clamp(18px,2.4vmin,24px);color:var(--meadow-ink)}
 
 /* learn + spell */
 .topline{display:flex;align-items:center;gap:14px;width:min(1000px,100%);margin-top:.5vh}
@@ -119,7 +132,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .dot.cur{background:var(--honey);transform:scale(1.3)}
 .dot.s3{background:var(--good)} .dot.s2{background:#7fd6a8} .dot.s1{background:var(--hint)} .dot.seen{background:var(--violet)}
 
-.card{background:var(--card);border-radius:36px;box-shadow:0 12px 0 rgba(43,45,66,.12),0 20px 40px rgba(43,45,66,.12);
+.card{background:var(--card-t);border-radius:36px;box-shadow:0 0 0 5px var(--ring),0 12px 0 rgba(43,45,66,.12),0 20px 40px rgba(43,45,66,.12);
   width:min(980px,100%);padding:3vh 3vw;margin-top:2vh;display:flex;flex-direction:column;align-items:center;gap:2vh;position:relative}
 .tiles{display:flex;gap:clamp(4px,1vw,12px);justify-content:center;flex-wrap:nowrap}
 .tile{--w:min(92px,calc(84vw / var(--n,6)));width:var(--w);height:calc(var(--w)*1.15);border-radius:18px;
@@ -186,6 +199,28 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .clock{font-variant-numeric:tabular-nums}
 .res.miss{background:#fff1d6}
 .res .fix{color:var(--good2);font-weight:600}
+/* themes */
+#themeArt{position:absolute;top:0;right:0;bottom:0;left:0}
+#themeArt svg{position:absolute;bottom:0;left:0;width:100%;height:100%}
+#themeArt .taxi{animation:taxi 16s linear infinite}
+@keyframes taxi{from{transform:translateX(-160px)}to{transform:translateX(1360px)}}
+#particles{position:absolute;top:0;right:0;bottom:0;left:0;overflow:hidden}
+#particles span{position:absolute;display:block;line-height:1}
+#particles .fall{top:-8%;animation:pfall linear infinite}
+#particles .fly{animation:pfly linear infinite}
+#particles .twinkle{animation:ptw ease-in-out infinite}
+@keyframes pfall{to{transform:translate3d(30px,118vh,0) rotate(120deg)}}
+@keyframes pfly{from{transform:translate3d(-12vw,0,0)}50%{transform:translate3d(55vw,-5vh,0)}to{transform:translate3d(118vw,3vh,0)}}
+@keyframes ptw{50%{opacity:.15;transform:scale(.6)}}
+.play-card::before,.play-card::after{content:var(--deco);position:absolute;top:8px;font-size:clamp(24px,calc(var(--h,100vh)*.05),42px);line-height:1}
+.play-card::before{left:14px}.play-card::after{right:14px}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
+.theme-card{border:0;border-radius:22px;padding:clamp(10px,2vh,22px) 8px;font:inherit;font-weight:600;font-size:clamp(17px,2.6vmin,24px);color:#fff;cursor:pointer;
+  text-shadow:0 2px 3px rgba(0,0,0,.45);box-shadow:0 6px 0 rgba(43,45,66,.2)}
+.theme-card .e{display:block;font-size:clamp(34px,calc(var(--h,100vh)*.08),64px);line-height:1.15}
+.theme-card.on{box-shadow:0 0 0 5px var(--honey),0 6px 0 rgba(43,45,66,.2)}
+.theme-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.theme-pills .list-pill{font-size:clamp(16px,2.4vmin,20px);padding:8px 14px}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -261,7 +296,9 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 <div id="scenery">
   <div class="sun"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div id="themeArt"></div>
   <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+  <div id="particles"></div>
 </div>
 <canvas id="confetti"></canvas>
 <div class="toast" id="toast" hidden></div>
@@ -274,6 +311,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="chip" id="streakChip" title="Days in a row"><span class="ic">🔥</span><span id="streakNum">0</span></div>
     <div class="spacer"></div>
     <div class="chip" id="listChip"><span class="ic">📚</span><span id="listName">No words yet</span></div>
+    <button class="iconbtn" id="themeBtn" aria-label="Pick a theme">🎨</button>
     <button class="iconbtn" id="gearBtn" aria-label="Grown-ups: press and hold">⚙️<span class="hold-ring" id="holdRing"></span></button>
   </header>
 
@@ -310,6 +348,15 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     </div>
   </section>
 
+  <!-- THEMES -->
+  <section class="screen" id="themes">
+    <div class="card done-card" style="margin:auto 0">
+      <div class="feedback good">🎨 Pick your round!</div>
+      <div class="theme-grid" id="themeGrid"></div>
+      <button class="btn green" id="themesDone">Let’s go! ➜</button>
+    </div>
+  </section>
+
   <!-- BUILD -->
   <section class="screen" id="build">
     <div class="topline"><div class="dots" id="buildDots"></div></div>
@@ -328,9 +375,10 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <!-- CHALLENGE INTRO -->
   <section class="screen" id="chIntro">
     <div class="card done-card">
-      <div class="trophy">🏆</div>
-      <div class="feedback good">Bee Challenge</div>
+      <div class="trophy" id="chIcon">🏆</div>
+      <div class="feedback good" id="chTitle">Bee Challenge</div>
       <div class="sentence">You’ll hear <b id="chCount">20</b> words, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.</div>
+      <div class="theme-pills" id="chThemes"></div>
       <div class="best" id="chBest"></div>
       <button class="toggle" id="timerToggle" aria-pressed="false"><span class="knob"></span><span id="timerLabel">⏱️ Timer: Off</span></button>
       <div class="card-actions">
@@ -424,6 +472,80 @@ const activeList = () => lists.find(l => l.id === activeId) || lists[0] || null;
 const prog = id => (progress[id] = progress[id] || {});
 const save = () => { store.set('lists', lists); store.set('active', activeId); store.set('progress', progress); store.set('honey', honey); store.set('streak', streak); store.set('player', player); };
 
+/* ---------- themes: only the look changes, never the words ---------- */
+const THEMES = {
+  garden: { name: 'Garden', icon: '🌸', tag: 'Grow a flower for every word you learn!', bg: 'linear-gradient(160deg,#7cc8f5,#86d65f)' },
+  castle: { name: 'Magic Castle', icon: '🏰', tag: 'Win a crown for every word you learn!', bg: 'linear-gradient(160deg,#3b1f7a,#d67fc4)', bloom: '👑', p: { e: ['✨', '⭐', '✨'], m: 'twinkle', n: 16 } },
+  kolkata: { name: 'Kolkata', icon: '🌉', tag: 'Fly a kite for every word you learn!', bg: 'linear-gradient(160deg,#f08a3c,#2f7f8f)', bloom: '🪁', p: { e: ['🪁', '🪁', '🕊️'], m: 'fly', n: 7 } },
+  christmas: { name: 'Christmas', icon: '🎄', tag: 'Light a tree for every word you learn!', bg: 'linear-gradient(160deg,#0d2350,#d62839)', bloom: '🎄', p: { e: ['❄️', '❄️', '❅'], m: 'fall', n: 16 } },
+  halloween: { name: 'Halloween', icon: '🎃', tag: 'Carve a pumpkin for every word you learn!', bg: 'linear-gradient(160deg,#1a0b2e,#ff7a18)', bloom: '🎃', p: { e: ['🦇', '🦇', '👻'], m: 'fly', n: 7 } }
+};
+let theme = store.get('theme', 'garden'); if (!THEMES[theme]) theme = 'garden';
+const T = () => THEMES[theme];
+function hatSVG() {
+  if (theme === 'christmas') return '<path d="M18 36 Q30 2 66 10 Q50 14 50 34 Z" fill="#d62839"/><rect x="12" y="32" width="42" height="9" rx="4.5" fill="#fff"/><circle cx="68" cy="11" r="6" fill="#fff"/>';
+  if (theme === 'halloween') return '<path d="M8 40 Q34 30 60 38 L38 4 Z" fill="#3a2452"/><rect x="24" y="30" width="24" height="5" fill="#ff7a18"/>';
+  if (theme === 'castle') return '<path d="M16 38 L14 16 L25 26 L33 10 L41 26 L52 16 L50 38 Z" fill="#ffd23f" stroke="#c98a00" stroke-width="2"/>';
+  return '';
+}
+function towerSVG(x, w, top, base, roof) {
+  return `<rect x="${x}" y="${top}" width="${w}" height="${base - top}" fill="#f6dff5"/><path d="M${x - 8} ${top} L${x + w / 2} ${top - w * 1.5} L${x + w + 8} ${top} Z" fill="${roof}"/><rect x="${x + w * .36}" y="${top + 30}" width="${w * .28}" height="34" rx="${w * .14}" fill="#7a4fc4"/><path d="M${x + w / 2} ${top - w * 1.5} v-34 l26 10 l-26 10" stroke="#fff" stroke-width="3" fill="#ffd23f"/>`;
+}
+function pineSVG(x, b, h) {
+  const lights = ['#ffd23f', '#ff5d73', '#6ee7ff', '#9dff8a'];
+  let l = ''; for (let i = 0; i < 7; i++) l += `<circle cx="${x - h * .22 + (i * 37 % 45) / 45 * h * .44}" cy="${b - h * .2 - (i * 61 % 50) / 50 * h * .55}" r="5" fill="${lights[i % 4]}"/>`;
+  return `<rect x="${x - 9}" y="${b - 24}" width="18" height="24" fill="#5b3a1e"/><path d="M${x} ${b - h} l${h * .22} ${h * .36} h${-h * .08} l${h * .2} ${h * .32} h${-h * .09} l${h * .25} ${h * .32} h${-h * 1} l${h * .25} ${-h * .32} h${-h * .09} l${h * .2} ${-h * .32} h${-h * .08} Z" fill="#1f7a4d"/>${l}<text x="${x}" y="${b - h + 6}" font-size="32" text-anchor="middle">⭐</text>`;
+}
+function artSVG() {
+  const open = '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">', close = '</svg>';
+  if (theme === 'castle') {
+    return open + `<g opacity=".96">${towerSVG(250, 70, 300, 720, '#ff7eb6')}${towerSVG(880, 70, 300, 720, '#ff7eb6')}${towerSVG(400, 90, 200, 720, '#8e6cff')}${towerSVG(710, 90, 200, 720, '#8e6cff')}${towerSVG(555, 90, 90, 720, '#ff7eb6')}
+      <rect x="290" y="420" width="620" height="300" fill="#f6dff5"/><path d="M290 420 h620 v-22 h-40 v14 h-40 v-14 h-40 v14 h-40 v-14 h-40 v14 h-40 v-14 h-40 v14 h-40 v-14 h-40 v14 h-40 v-14 h-40 v14 h-40 v-14 h-40 v14 h-40 v-14 h-60 Z" fill="#f6dff5"/>
+      <path d="M545 720 v-110 a55 55 0 0 1 110 0 v110 Z" fill="#5b3aa8"/></g>` + close;
+  }
+  if (theme === 'kolkata') {
+    let truss = ''; for (let x = 100; x <= 1100; x += 50) truss += `<path d="M${x} 520 L${x + 25} ${450 - Math.round(Math.abs(Math.abs(x - 600) - 300) / 300 * -1 * 0)} L${x + 50} 520" stroke="#54626b" stroke-width="5" fill="none"/>`;
+    let city = ''; [[0, 90], [70, 140], [150, 100], [240, 170], [330, 110], [800, 130], [880, 170], [970, 100], [1050, 150], [1130, 110]].forEach(([x, h]) => { city += `<rect x="${x}" y="${600 - h}" width="72" height="${h}" fill="#c9733c" opacity=".55"/>`; });
+    return open + city + `<rect x="0" y="600" width="1200" height="200" fill="#2f7f8f"/>
+      <path d="M0 520 Q300 300 300 170 Q300 300 600 480 Q900 300 900 170 Q900 300 1200 520" stroke="#54626b" stroke-width="10" fill="none"/>
+      <path d="M0 520 L300 240 L600 500 L900 240 L1200 520" stroke="#54626b" stroke-width="7" fill="none"/>
+      <rect x="270" y="150" width="20" height="450" fill="#46525a"/><rect x="310" y="150" width="20" height="450" fill="#46525a"/><rect x="870" y="150" width="20" height="450" fill="#46525a"/><rect x="910" y="150" width="20" height="450" fill="#46525a"/>
+      <rect x="262" y="145" width="76" height="14" fill="#46525a"/><rect x="862" y="145" width="76" height="14" fill="#46525a"/>
+      ${truss}<rect x="0" y="515" width="1200" height="14" fill="#46525a"/>
+      <g class="taxi"><rect x="0" y="482" width="96" height="26" rx="6" fill="#ffc21a"/><rect x="18" y="464" width="56" height="22" rx="6" fill="#ffc21a"/><rect x="26" y="469" width="18" height="13" fill="#bfe6f5"/><rect x="48" y="469" width="18" height="13" fill="#bfe6f5"/><circle cx="22" cy="510" r="8" fill="#222"/><circle cx="74" cy="510" r="8" fill="#222"/></g>
+      <path d="M160 640 h130 l-24 26 h-84 Z" fill="#7a3e1c"/><path d="M225 640 V590 l34 40 Z" fill="#fff4dc"/>` + close;
+  }
+  if (theme === 'christmas') {
+    return open + pineSVG(170, 720, 340) + pineSVG(330, 730, 240) + pineSVG(1040, 720, 360) + pineSVG(880, 730, 230) +
+      `<rect x="500" y="520" width="200" height="190" fill="#8a4b2a"/><path d="M470 530 L600 420 L730 530 Z" fill="#eef5fb"/><rect x="580" y="610" width="44" height="100" fill="#d62839"/><rect x="520" y="560" width="46" height="46" fill="#ffe08a"/><rect x="636" y="560" width="46" height="46" fill="#ffe08a"/>` + close;
+  }
+  if (theme === 'halloween') {
+    return open + `<g fill="#120a20"><rect x="470" y="380" width="270" height="340"/><path d="M450 390 L605 240 L760 390 Z"/><rect x="430" y="300" width="70" height="420"/><path d="M415 305 L465 170 L515 305 Z"/><rect x="690" y="330" width="60" height="390"/><path d="M675 335 L720 220 L765 335 Z"/></g>
+      <g fill="#ffb13d"><rect x="520" y="440" width="46" height="60"/><rect x="640" y="440" width="46" height="60"/><rect x="450" y="360" width="28" height="40"/><path d="M570 720 v-70 a34 34 0 0 1 68 0 v70 Z" fill="#3a1f0c"/></g>
+      <path d="M140 730 C150 600 150 520 130 430 M138 560 C100 520 80 500 50 490 M145 500 C180 460 210 440 240 430 M134 450 C120 410 100 390 80 370 M150 610 C190 590 220 590 250 570" stroke="#120a20" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <text x="900" y="720" font-size="70">🎃</text><text x="290" y="735" font-size="56">🎃</text><text x="1030" y="735" font-size="54">🎃</text>` + close;
+  }
+  return '';
+}
+function particles() {
+  const box = document.querySelector('#particles'), p = T().p; if (!box) return;
+  if (!p) { box.innerHTML = ''; return; }
+  let h = '';
+  for (let i = 0; i < p.n; i++) {
+    const dur = p.m === 'fall' ? 7 + Math.random() * 7 : p.m === 'fly' ? 18 + Math.random() * 16 : 2.5 + Math.random() * 3, size = 16 + Math.random() * 22;
+    const pos = p.m === 'fall' ? `left:${Math.random() * 100}%` : p.m === 'fly' ? `left:0;top:${6 + Math.random() * 50}%` : `left:${Math.random() * 100}%;top:${Math.random() * 62}%`;
+    h += `<span class="${p.m}" style="${pos};font-size:${size}px;animation-duration:${dur}s;animation-delay:${-Math.random() * dur}s">${p.e[i % p.e.length]}</span>`;
+  }
+  box.innerHTML = h;
+}
+function applyTheme() {
+  document.documentElement.dataset.theme = theme;
+  document.querySelector('#themeArt').innerHTML = artSVG();
+  particles();
+  const hb = document.querySelector('#homeBee'); if (hb) hb.innerHTML = beeSVG();
+}
+function setTheme(t) { theme = t; store.set('theme', t); applyTheme(); }
+
 /* ---------- audio: speech ---------- */
 const LETTER = {a:'ay',b:'bee',c:'see',d:'dee',e:'ee',f:'ef',g:'jee',h:'aitch',i:'eye',j:'jay',k:'kay',l:'el',m:'em',n:'en',o:'oh',p:'pee',q:'cue',r:'are',s:'ess',t:'tee',u:'you',v:'vee',w:'double you',x:'ex',y:'why',z:'zee'};
 let voice = null;
@@ -495,7 +617,7 @@ function beeSVG() {
   <path d="M30 74 Q38 82 46 74" stroke="#2b2d42" stroke-width="3.5" fill="none" stroke-linecap="round"/>
   <circle cx="24" cy="72" r="5" fill="#ff9bb8" opacity=".7"/><circle cx="52" cy="71" r="5" fill="#ff9bb8" opacity=".7"/>
   <path d="M34 40 Q28 24 20 22 M44 38 Q44 22 38 16" stroke="#2b2d42" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <circle cx="20" cy="22" r="4" fill="#2b2d42"/><circle cx="38" cy="16" r="4" fill="#2b2d42"/></svg>`;
+  <circle cx="20" cy="22" r="4" fill="#2b2d42"/><circle cx="38" cy="16" r="4" fill="#2b2d42"/>${hatSVG()}</svg>`;
 }
 const PETALS = ['#ff7eb6', '#ff9f1c', '#8e6cff', '#ff6b6b', '#4cc9f0', '#f15bb5', '#ffd23f', '#9b5de5'];
 function hash(s) { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
@@ -509,7 +631,8 @@ function flowerSVG(stage, word) {
     <path d="M30 ${stage === 1 ? 54 : 50} Q18 ${stage === 1 ? 44 : 40} 14 ${stage === 1 ? 50 : 46} Q22 ${stage === 1 ? 56 : 52} 30 ${stage === 1 ? 54 : 50}" fill="#5fc444"/>
     <path d="M30 ${stage === 1 ? 52 : 44} Q42 ${stage === 1 ? 42 : 34} 46 ${stage === 1 ? 48 : 40} Q38 ${stage === 1 ? 54 : 46} 30 ${stage === 1 ? 52 : 44}" fill="#6fd453"/>`;
   if (stage === 2) s += `<ellipse cx="30" cy="20" rx="7" ry="10" fill="${col}"/><path d="M23 24 Q30 32 37 24" fill="#5fc444"/>`;
-  if (stage === 3) {
+  if (stage === 3 && T().bloom) s += `<text x="30" y="32" font-size="32" text-anchor="middle">${T().bloom}</text>`;
+  else if (stage === 3) {
     for (let i = 0; i < 6; i++) s += `<ellipse cx="30" cy="9" rx="7" ry="11" fill="${col}" transform="rotate(${i * 60} 30 20)"/>`;
     s += `<circle cx="30" cy="20" r="7" fill="#ffd23f" stroke="#f0a500" stroke-width="2"/><circle cx="28" cy="18" r="1.4" fill="#2b2d42"/><circle cx="32.5" cy="18" r="1.4" fill="#2b2d42"/>`;
   }
@@ -552,6 +675,7 @@ function tipFor(w) {
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   $('#homeBtn').style.display = id === 'home' ? 'none' : '';
+  $('#themeBtn').style.display = id === 'home' ? '' : 'none';
 }
 function bumpHoney(add) {
   honey += add; $('#honeyNum').textContent = honey;
@@ -568,7 +692,7 @@ function dayKey(off) { const d = new Date(); d.setDate(d.getDate() + off); retur
 let lastStages = {};
 function renderHome() {
   renderHeader();
-  $('#hello').textContent = player ? `Hi ${player}! Grow a flower for every word you learn!` : 'Grow a flower for every word you learn!';
+  $('#hello').textContent = (player ? `Hi ${player}! ` : '') + T().tag;
   const L = activeList(), g = $('#garden');
   $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
   if (!L) {
@@ -932,12 +1056,16 @@ function startClock() { stopClock(); clockT0 = Date.now(); $('#clockNum').textCo
 function stopClock() { clearInterval(clockIv); clockIv = 0; }
 function renderChIntro() {
   const L = activeList(); if (!L) return;
+  $('#chIcon').textContent = theme === 'garden' ? '🏆' : T().icon;
+  $('#chTitle').textContent = theme === 'garden' ? 'Bee Challenge' : `${T().name} Round`;
+  $('#chThemes').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="list-pill ${k === theme ? 'on' : ''}" data-t="${k}">${t.icon} ${t.name}</button>`).join('');
   const n = Math.min(20, L.words.length); $('#chCount').textContent = n;
   $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
   const best = (store.get('best', {}))[L.id];
   $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') : '';
 }
-function openChallenge() { newRun(); renderChIntro(); show('chIntro'); const id = newRun(); sayIf(id, `Welcome to the Bee Challenge! No hints this time. You can do it${nameBit()}!`, { rate: 0.95, pitch: 1.12 }); }
+function roundName() { return theme === 'garden' ? 'the Bee Challenge' : `the ${T().name} round`; }
+function openChallenge() { newRun(); renderChIntro(); show('chIntro'); const id = newRun(); sayIf(id, `Welcome to ${roundName()}! No hints this time. You can do it${nameBit()}!`, { rate: 0.95, pitch: 1.12 }); }
 function startChallenge() {
   const L = activeList(); if (!L) return;
   S = { mode: 'challenge', list: L, words: shuffle(L.words).slice(0, 20), i: 0, marks: [], results: [] };
@@ -1028,6 +1156,10 @@ function endChallenge() {
   const id = newRun();
   sayIf(id, `${out.title.replace(/[^a-zA-Z' ]/g, '')}${nameBit()}! You spelled ${score} out of ${n} words correctly.${record && prev ? ' A new record!' : ''}`, { rate: 0.95, pitch: 1.12 });
 }
+function renderThemes() { $('#themeGrid').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="theme-card ${k === theme ? 'on' : ''}" data-t="${k}" style="background:${t.bg}"><span class="e">${t.icon}</span>${t.name}</button>`).join(''); }
+$('#themeGrid').onclick = e => { const b = e.target.closest('.theme-card'); if (!b) return; actx(); sfx.bloom(); setTheme(b.dataset.t); renderThemes(); };
+$('#chThemes').onclick = e => { const b = e.target.closest('.list-pill'); if (!b) return; actx(); sfx.bloom(); setTheme(b.dataset.t); renderChIntro(); };
+$('#themeBtn').onclick = () => { newRun(); stopClock(); S = null; actx(); sfx.tap(); renderThemes(); show('themes'); };
 $('#btOk').onclick = () => { $('#bigToast').hidden = true; newRun(); sfx.tap(); };
 
 /* ---------- keyboard ---------- */
@@ -1109,6 +1241,7 @@ $('#buildSpeak').onclick = () => { if (S && S.mode === 'build' && !S.busy) promp
 $('#timerToggle').onclick = () => { timerOn = !timerOn; store.set('timer', timerOn); sfx.tap(); renderChIntro(); };
 $('#chStart').onclick = () => { actx(); sfx.tap(); startChallenge(); };
 $('#chBack').onclick = goHome;
+$('#themesDone').onclick = goHome;
 $('#learnSpeak').onclick = () => { if (!S) return; const id = newRun(); $('#learnSpeak').classList.add('talking'); sayIf(id, S.words[S.i].w, { rate: 0.75 }).then(() => $('#learnSpeak').classList.remove('talking')); };
 $('#learnAgain').onclick = () => learnShow();
 $('#learnNext').onclick = learnNext;
@@ -1123,7 +1256,7 @@ $('#playerName').oninput = e => { player = e.target.value.trim(); save(); };
 $('#setupDone').onclick = goHome;
 
 addEventListener('resize', () => { if ($('#home').classList.contains('on')) renderHome(); });
-$('#homeBee').innerHTML = beeSVG();
+applyTheme();
 buildKB();
 goHome();
 
