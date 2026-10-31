@@ -395,7 +395,8 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="card done-card">
       <div class="trophy" id="chIcon">🏆</div>
       <div class="feedback good" id="chTitle">Bee Challenge</div>
-      <div class="sentence">You’ll hear <b id="chCount">20</b> words, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.</div>
+      <div class="round-tabs" id="chRounds"></div>
+      <div class="sentence">You’ll hear <b id="chCount">20</b> <span id="chWords">words</span>, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.</div>
       <div class="theme-pills" id="chThemes"></div>
       <div class="best" id="chBest"></div>
       <button class="toggle" id="timerToggle" aria-pressed="false"><span class="knob"></span><span id="timerLabel">⏱️ Timer: Off</span></button>
@@ -1114,7 +1115,8 @@ function renderChIntro() {
   $('#chIcon').textContent = theme === 'garden' ? '🏆' : T().icon;
   $('#chTitle').textContent = theme === 'garden' ? 'Bee Challenge' : `${T().name} Round`;
   $('#chThemes').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="list-pill ${k === theme ? 'on' : ''}" data-t="${k}">${t.icon} ${t.name}</button>`).join('');
-  const n = Math.min(20, L.words.length); $('#chCount').textContent = n;
+  const n = Math.min(20, L.words.length); $('#chCount').textContent = n; $('#chWords').textContent = n === 1 ? 'word' : 'words';
+  $('#chRounds').innerHTML = lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">Round ${k + 1}: ${esc(l.name)}</button>`).join('') : '';
   $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
   const best = (store.get('best', {}))[L.id];
   $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') : '';
@@ -1213,6 +1215,7 @@ function endChallenge() {
 }
 function renderThemes() { $('#themeGrid').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="theme-card ${k === theme ? 'on' : ''}" data-t="${k}" style="background:${t.bg}"><span class="e">${t.icon}</span>${t.name}</button>`).join(''); }
 $('#themeGrid').onclick = e => { const b = e.target.closest('.theme-card'); if (!b) return; actx(); sfx.bloom(); setTheme(b.dataset.t); renderThemes(); };
+$('#chRounds').onclick = e => { const b = e.target.closest('.round-tab'); if (!b) return; actx(); sfx.bloom(); activeId = b.dataset.id; save(); renderHeader(); renderChIntro(); };
 $('#chThemes').onclick = e => { const b = e.target.closest('.list-pill'); if (!b) return; actx(); sfx.bloom(); setTheme(b.dataset.t); renderChIntro(); };
 $('#themeBtn').onclick = () => { newRun(); stopClock(); S = null; actx(); sfx.tap(); renderThemes(); show('themes'); };
 $('#btOk').onclick = () => { $('#bigToast').hidden = true; newRun(); sfx.tap(); };
