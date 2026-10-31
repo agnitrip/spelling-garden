@@ -487,6 +487,11 @@ let progress = store.get('progress', {});    // {listId:{word:{b,seen,ok,miss,la
 let honey = store.get('honey', 0);
 let streak = store.get('streak', { last: null, n: 0 });
 let player = store.get('player', '');
+// the two Bee lists show as levels; ids stay the same so progress already on a device is kept
+const LEVELS = { '1st-grade-bee': { name: 'Medium Girl', icon: '🐝' }, '2nd-grade-bee': { name: 'Big Girl', icon: '👑' } };
+function nameLevels() { lists.forEach(l => { if (LEVELS[l.id]) l.name = LEVELS[l.id].name; }); }
+const roundLabel = (l, k) => (LEVELS[l.id] ? `${LEVELS[l.id].icon} ${l.name}` : `Round ${k + 1}: ${esc(l.name)}`);
+nameLevels();
 const activeList = () => lists.find(l => l.id === activeId) || lists[0] || null;
 const prog = id => (progress[id] = progress[id] || {});
 const save = () => { store.set('lists', lists); store.set('active', activeId); store.set('progress', progress); store.set('honey', honey); store.set('streak', streak); store.set('player', player); };
@@ -747,7 +752,7 @@ function renderHome() {
   const L = activeList(), g = $('#garden');
   $('#roundTabs').innerHTML = lists.length > 1 ? lists.map((l, k) => {
     const P = prog(l.id), blooms = l.words.filter(({ w }) => stageOf(P[w]) === 3).length;
-    return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">Round ${k + 1}: ${esc(l.name)}<small>${T().icon} ${blooms} / ${l.words.length}</small></button>`;
+    return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}<small>${T().icon} ${blooms} / ${l.words.length}</small></button>`;
   }).join('') : '';
   $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
   if (!L) {
@@ -1116,7 +1121,7 @@ function renderChIntro() {
   $('#chTitle').textContent = theme === 'garden' ? 'Bee Challenge' : `${T().name} Round`;
   $('#chThemes').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="list-pill ${k === theme ? 'on' : ''}" data-t="${k}">${t.icon} ${t.name}</button>`).join('');
   const n = Math.min(20, L.words.length); $('#chCount').textContent = n; $('#chWords').textContent = n === 1 ? 'word' : 'words';
-  $('#chRounds').innerHTML = lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">Round ${k + 1}: ${esc(l.name)}</button>`).join('') : '';
+  $('#chRounds').innerHTML = lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}</button>`).join('') : '';
   $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
   const best = (store.get('best', {}))[L.id];
   $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') : '';
@@ -1259,9 +1264,10 @@ function doImport(text) {
   const { lists: got, skipped } = parseLists(text);
   if (!got.length) { $('#importMsg').textContent = 'No words found. One word per line, please.'; return; }
   for (const l of got) { const i = lists.findIndex(x => x.id === l.id); if (i >= 0) lists[i] = l; else lists.push(l); }
+  nameLevels();
   if (!activeList() || !lists.some(l => l.id === activeId)) activeId = got[0].id;
   save(); renderSetup();
-  $('#importMsg').textContent = `Added: ${got.map(l => `${l.name} (${l.words.length} words)`).join(', ')}` + (skipped.length ? `. Skipped (letters only): ${skipped.join(', ')}` : '');
+  $('#importMsg').textContent = `Added: ${got.map(l => `${(LEVELS[l.id] || l).name} (${l.words.length} words)`).join(', ')}` + (skipped.length ? `. Skipped (letters only): ${skipped.join(', ')}` : '');
   $('#importText').value = '';
 }
 function renderSetup() {
