@@ -226,6 +226,18 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   background:rgba(255,255,255,.88);color:var(--ink);box-shadow:0 4px 0 rgba(43,45,66,.18)}
 .round-tab small{display:block;font-weight:500;font-size:.72em;opacity:.8}
 .round-tab.on{background:var(--honey);color:#5a3500;box-shadow:0 0 0 3px #fff,0 4px 0 var(--honey2)}
+/* cheering characters: they sit at the card's sides, so tiles get the width between them */
+.has-chars{--chw:clamp(78px,13vw,130px);--inner:calc(min(980px,100vw - 32px) - 2*var(--chw) - 24px);padding-left:var(--chw);padding-right:var(--chw)}
+.has-chars .tile{--w:min(92px,calc(var(--inner) / var(--n,6) - 12px),calc(var(--h,100vh)*.115))}
+#learn .has-chars .tile{--w:min(110px,calc(var(--inner) / var(--n,6) - 12px))}
+.char{position:absolute;top:50%;width:var(--chw);margin-top:calc(var(--chw)*-.52);pointer-events:none;animation:idle 3s ease-in-out infinite}
+.char.l{left:4px}.char.r{right:4px;animation-delay:-1.4s}
+.char svg{display:block;width:100%;height:auto}
+.char.happy{animation:cheer .55s ease-in-out infinite alternate}
+.char.sad{animation:sad 1.6s ease-in-out infinite}
+@keyframes idle{50%{transform:translateY(-5px)}}
+@keyframes cheer{from{transform:translateY(0) rotate(-5deg) scale(1)}to{transform:translateY(-16px) rotate(5deg) scale(1.08)}}
+@keyframes sad{0%,100%{transform:translateY(8px) rotate(-2deg)}50%{transform:translateY(10px) rotate(2deg)}}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -343,7 +355,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <!-- LEARN -->
   <section class="screen" id="learn">
     <div class="topline"><div class="dots" id="learnDots"></div></div>
-    <div class="card">
+    <div class="card has-chars"><div class="char l"></div><div class="char r"></div>
       <button class="speak-big" id="learnSpeak" aria-label="Hear it again">🔊</button>
       <div class="tiles" id="learnTiles"></div>
       <div class="sentence" id="learnSentence"></div>
@@ -366,7 +378,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <!-- BUILD -->
   <section class="screen" id="build">
     <div class="topline"><div class="dots" id="buildDots"></div></div>
-    <div class="card play-card">
+    <div class="card play-card has-chars"><div class="char l"></div><div class="char r"></div>
       <div class="prompt-row"><button class="speak-big" id="buildSpeak" aria-label="Hear the word">🔊</button><div class="sentence" id="buildSentence"></div></div>
       <div class="tiles" id="buildSlots"></div>
       <div class="fb-row"><div class="feedback" id="buildFeedback"></div><div class="stars-earned" id="buildStars"></div></div>
@@ -397,7 +409,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <!-- SPELL (also used by Bee Challenge) -->
   <section class="screen" id="spell">
     <div class="topline"><div class="dots" id="spellDots"></div><div class="chip score" id="scoreDone" hidden>📝 <span id="scoreDoneNum">0/20</span></div><div class="chip score good" id="scoreRight" hidden>✅ <span id="scoreRightNum">0</span></div><div class="chip clock" id="clock" hidden>⏱️ <span id="clockNum">0:00</span></div></div>
-    <div class="card play-card">
+    <div class="card play-card has-chars"><div class="char l"></div><div class="char r"></div>
       <div class="prompt-row"><button class="speak-big" id="spellSpeak" aria-label="Hear the word">🔊</button><div class="sentence" id="spellSentence"></div></div>
       <div class="tiles" id="spellTiles"></div>
       <div class="fb-row"><div class="feedback" id="spellFeedback"></div><div class="stars-earned" id="spellStars"></div></div>
@@ -533,6 +545,38 @@ function artSVG() {
   }
   return '';
 }
+/* two original characters per theme; the face is the same set of moods on every body */
+function faceSVG(cx, cy, mood, k = 1) {
+  const ink = '#2b2d42'; let f;
+  if (mood === 'happy') f = `<path d="M-22 -4 q8 -10 16 0 M6 -4 q8 -10 16 0" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M-15 8 q15 4 30 0 q-2 20 -15 20 q-13 0 -15 -20 Z" fill="#c0392b" stroke="${ink}" stroke-width="3"/><circle cx="-26" cy="8" r="6" fill="#ff9bb8" opacity=".75"/><circle cx="26" cy="8" r="6" fill="#ff9bb8" opacity=".75"/>`;
+  else if (mood === 'sad') f = `<path d="M-23 -9 l13 -6 M23 -9 l-13 -6" stroke="${ink}" stroke-width="3.5" stroke-linecap="round"/><circle cx="-14" cy="-2" r="5.5" fill="${ink}"/><circle cx="14" cy="-2" r="5.5" fill="${ink}"/><path d="M-12 20 q12 -12 24 0" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M19 5 q6 9 0 12 q-6 -3 0 -12" fill="#58b7ff"/>`;
+  else f = `<circle cx="-14" cy="-2" r="5.5" fill="${ink}"/><circle cx="14" cy="-2" r="5.5" fill="${ink}"/><circle cx="-12" cy="-4" r="1.8" fill="#fff"/><circle cx="16" cy="-4" r="1.8" fill="#fff"/><path d="M-10 12 q10 8 20 0" stroke="${ink}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  return `<g transform="translate(${cx} ${cy}) scale(${k})">${f}</g>`;
+}
+const CHARS = {
+  bee: m => `<ellipse cx="22" cy="48" rx="20" ry="28" fill="#eaf8ff" stroke="#8fcbe8" stroke-width="3" transform="rotate(-24 22 48)"/><ellipse cx="98" cy="48" rx="20" ry="28" fill="#eaf8ff" stroke="#8fcbe8" stroke-width="3" transform="rotate(24 98 48)"/><path d="M44 28 Q38 10 28 10 M76 28 Q82 10 92 10" stroke="#2b2d42" stroke-width="4" fill="none"/><circle cx="28" cy="10" r="5" fill="#2b2d42"/><circle cx="92" cy="10" r="5" fill="#2b2d42"/><ellipse cx="60" cy="72" rx="42" ry="46" fill="#ffcf3f" stroke="#2b2d42" stroke-width="4"/><path d="M21 94 Q60 108 99 94 L91 106 Q60 118 29 106 Z" fill="#2b2d42"/>${faceSVG(60, 60, m)}`,
+  flower: m => `<path d="M60 90 V130" stroke="#3f9a2f" stroke-width="8"/><path d="M60 118 Q34 100 22 112 Q38 128 60 118 M60 118 Q86 100 98 112 Q82 128 60 118" fill="#5fc444"/>${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<ellipse cx="60" cy="16" rx="15" ry="22" fill="#ff7eb6" transform="rotate(${a} 60 52)"/>`).join('')}<circle cx="60" cy="52" r="32" fill="#ffd23f" stroke="#f0a500" stroke-width="3"/>${faceSVG(60, 52, m, .85)}`,
+  princess: m => `<path d="M26 130 Q34 84 60 84 Q86 84 94 130 Z" fill="#ff7eb6"/><path d="M26 56 Q24 10 60 10 Q96 10 94 56 L98 96 L78 88 H42 L22 96 Z" fill="#3a2418"/><circle cx="60" cy="54" r="30" fill="#d9a273"/><path d="M32 46 Q40 22 60 26 Q80 22 88 46 Q70 34 60 36 Q50 34 32 46" fill="#3a2418"/><path d="M42 24 L38 4 L50 14 L60 0 L70 14 L82 4 L78 24 Z" fill="#ffd23f" stroke="#c98a00" stroke-width="2"/>${faceSVG(60, 58, m, .8)}`,
+  dragon: m => `<path d="M12 96 Q2 56 30 66 Z M108 96 Q118 56 90 66 Z" fill="#8e6cff"/><path d="M38 28 L30 6 L52 22 Z M82 28 L90 6 L68 22 Z" fill="#ffd23f"/><ellipse cx="60" cy="74" rx="44" ry="50" fill="#5fc444" stroke="#3f9a2f" stroke-width="4"/><ellipse cx="60" cy="102" rx="24" ry="20" fill="#c8f2a8"/>${faceSVG(60, 58, m, .95)}`,
+  taxi: m => `<rect x="44" y="4" width="32" height="14" rx="4" fill="#2b2d42"/><text x="60" y="15" font-size="10" font-weight="700" fill="#ffc21a" text-anchor="middle">TAXI</text><path d="M30 18 H90 L104 58 H16 Z" fill="#ffc21a" stroke="#2b2d42" stroke-width="3"/><path d="M38 26 H82 L92 56 H28 Z" fill="#bfe6f5"/><rect x="10" y="56" width="100" height="52" rx="12" fill="#ffc21a" stroke="#2b2d42" stroke-width="3"/><rect x="16" y="106" width="20" height="18" rx="4" fill="#2b2d42"/><rect x="84" y="106" width="20" height="18" rx="4" fill="#2b2d42"/>${faceSVG(60, 76, m, .9)}`,
+  tiger: m => `<circle cx="24" cy="30" r="16" fill="#f08a3c" stroke="#2b2d42" stroke-width="3"/><circle cx="96" cy="30" r="16" fill="#f08a3c" stroke="#2b2d42" stroke-width="3"/><circle cx="60" cy="70" r="50" fill="#f08a3c" stroke="#2b2d42" stroke-width="3"/><ellipse cx="60" cy="92" rx="30" ry="24" fill="#fff4dc"/><path d="M60 21 V38 M46 23 L49 36 M74 23 L71 36 M12 62 H28 M14 80 H28 M108 62 H92 M106 80 H92" stroke="#2b2d42" stroke-width="5" stroke-linecap="round"/>${faceSVG(60, 72, m, .95)}`,
+  snowman: m => `<circle cx="60" cy="96" r="32" fill="#fff" stroke="#b9cfe2" stroke-width="3"/><circle cx="60" cy="48" r="28" fill="#fff" stroke="#b9cfe2" stroke-width="3"/><rect x="38" y="6" width="44" height="22" fill="#2b2d42"/><rect x="28" y="26" width="64" height="7" rx="3" fill="#2b2d42"/><path d="M32 74 Q60 86 88 74 L88 84 Q60 94 32 84 Z" fill="#d62839"/><circle cx="60" cy="102" r="4" fill="#2b2d42"/><circle cx="60" cy="116" r="4" fill="#2b2d42"/>${faceSVG(60, 50, m, .75)}<path d="M60 50 L76 54 L60 57 Z" fill="#ff9f1c"/>`,
+  reindeer: m => `<path d="M36 34 Q26 16 14 12 M28 22 Q18 26 10 24 M84 34 Q94 16 106 12 M92 22 Q102 26 110 24" stroke="#7a4a24" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="74" rx="42" ry="48" fill="#a8703f" stroke="#7a4a24" stroke-width="3"/><ellipse cx="60" cy="100" rx="26" ry="20" fill="#d9b48a"/>${faceSVG(60, 62, m, .85)}<circle cx="60" cy="86" r="9" fill="#d62839"/>`,
+  pumpkin: m => `<path d="M60 26 Q58 8 72 6" stroke="#3f9a2f" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="28" cy="76" rx="26" ry="44" fill="#f07a12"/><ellipse cx="92" cy="76" rx="26" ry="44" fill="#f07a12"/><ellipse cx="60" cy="74" rx="36" ry="48" fill="#ff9a2e"/>${faceSVG(60, 74, m)}`,
+  ghost: m => `<path d="M16 124 V54 Q16 8 60 8 Q104 8 104 54 V124 L88 110 L74 124 L60 110 L46 124 L32 110 Z" fill="#fff" stroke="#c6c9dc" stroke-width="3"/>${faceSVG(60, 58, m)}`
+};
+const CAST = { garden: ['bee', 'flower'], castle: ['princess', 'dragon'], kolkata: ['taxi', 'tiger'], christmas: ['snowman', 'reindeer'], halloween: ['pumpkin', 'ghost'] };
+let mood = 'idle';
+function setMood(m) {
+  mood = m;
+  document.querySelectorAll('.has-chars').forEach(card => {
+    [['.char.l', 0], ['.char.r', 1]].forEach(([sel, k]) => {
+      const el = card.querySelector(sel);
+      el.className = `char ${k ? 'r' : 'l'} ${m}`;
+      el.innerHTML = `<svg viewBox="0 0 120 132" aria-hidden="true">${CHARS[CAST[theme][k]](m)}</svg>`;
+    });
+  });
+}
 function particles() {
   const box = document.querySelector('#particles'), p = T().p; if (!box) return;
   if (!p) { box.innerHTML = ''; return; }
@@ -547,7 +591,7 @@ function particles() {
 function applyTheme() {
   document.documentElement.dataset.theme = theme;
   document.querySelector('#themeArt').innerHTML = artSVG();
-  particles();
+  particles(); setMood('idle');
   const hb = document.querySelector('#homeBee'); if (hb) hb.innerHTML = beeSVG();
 }
 function setTheme(t) { theme = t; store.set('theme', t); applyTheme(); }
@@ -749,7 +793,7 @@ async function learnShow() {
   const id = newRun(), w = S.words[S.i];
   dots($('#learnDots'), S.words.length, S.i, S.marks);
   $('#learnTiles').innerHTML = tilesHTML(w.w);
-  $('#learnSentence').innerHTML = '';
+  $('#learnSentence').innerHTML = ''; setMood('idle');
   $('#learnNext').disabled = true; $('#learnNext').classList.remove('pulse');
   $('#learnSpeak').classList.add('talking');
   await wait(350);
@@ -763,7 +807,7 @@ async function learnShow() {
   if (w.s) { $('#learnSentence').innerHTML = highlight(w.s, w.w); await wait(200); if (!await sayIf(id, w.s, { rate: 0.85 })) return; }
   $('#learnSpeak').classList.remove('talking');
   const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 }; r.seen++; save();
-  S.marks[S.i] = 'seen';
+  S.marks[S.i] = 'seen'; setMood('happy');
   $('#learnNext').disabled = false; $('#learnNext').classList.add('pulse');
 }
 function learnNext() {
@@ -794,7 +838,7 @@ function spellShow() {
   S.w = w.w; S.typed = Array(w.w.length).fill(''); S.locked = Array(w.w.length).fill(false); S.attempt = 1; S.copy = false; S.busy = false;
   dots($('#spellDots'), S.words.length, S.i, S.marks);
   $('#spellFeedback').textContent = ''; $('#spellFeedback').className = 'feedback';
-  $('#spellStars').innerHTML = '';
+  $('#spellStars').innerHTML = ''; setMood('idle');
   $('#spellSentence').innerHTML = w.s ? blank(w.s, w.w) : '&nbsp;';
   renderSlots(); renderGo();
   promptWord();
@@ -824,7 +868,7 @@ function renderGo() { const g = $('#kbGo'); if (g) { const full = cursorIndex() 
 function typeLetter(ch) {
   if (!typing() || S.busy) return;
   const k = cursorIndex(); if (k === -1) return;
-  actx(); sfx.tap();
+  actx(); sfx.tap(); if (mood !== 'idle') setMood('idle');
   S.typed[k] = ch; renderSlots({ [k]: 'in' }); renderGo();
 }
 function clearSlot(k) {
@@ -846,7 +890,7 @@ async function check() {
     let stars = S.copy ? 1 : S.attempt === 1 ? 3 : 2;
     if (S.attempt === 1 && !S.copy) { r.b = Math.min(5, r.b + 1); r.ok++; }
     r.last = Date.now(); save();
-    S.marks[S.i] = 's' + stars; S.results.push({ w: w.w, stars });
+    S.marks[S.i] = 's' + stars; S.results.push({ w: w.w, stars }); setMood('happy');
     const ok = {}; S.w.split('').forEach((_, k) => ok[k] = 'ok dance'); S.locked = S.locked.map(() => true); renderSlots(ok);
     const praise = (stars === 3 ? pick(P3) : stars === 2 ? pick(P2) : pick(P1));
     $('#spellFeedback').className = 'feedback good'; $('#spellFeedback').textContent = praise;
@@ -863,6 +907,7 @@ async function check() {
     return;
   }
   // wrong
+  setMood('sad');
   if (S.copy) {
     sfx.soft();
     $('#spellFeedback').className = 'feedback try'; $('#spellFeedback').textContent = 'Copy the light letters!';
@@ -943,7 +988,7 @@ function buildShow() {
   S.tray = shuffle(letters).map(c => ({ c, used: false }));
   dots($('#buildDots'), S.words.length, S.i, S.marks);
   $('#buildFeedback').textContent = ''; $('#buildFeedback').className = 'feedback';
-  $('#buildStars').innerHTML = '';
+  $('#buildStars').innerHTML = ''; setMood('idle');
   const s = S.words[S.i].s; $('#buildSentence').innerHTML = s ? blank(s, w) : '&nbsp;';
   renderBuild();
   [...$('#tray').children].forEach((t, k) => { t.classList.add('in'); t.style.animationDelay = (k * 0.05) + 's'; });
@@ -971,7 +1016,7 @@ function renderBuild(extra = {}) {
 function buildPlace(t) {
   if (!S || S.mode !== 'build' || S.busy || S.tray[t].used) return;
   const k = S.slots.findIndex((v, i) => v == null && !S.locked[i]); if (k === -1) return;
-  actx(); sfx.tap(); say(LETTER[S.tray[t].c], { rate: 1.1 });
+  actx(); sfx.tap(); say(LETTER[S.tray[t].c], { rate: 1.1 }); if (mood !== 'idle') setMood('idle');
   S.slots[k] = t; S.tray[t].used = true; renderBuild({ [k]: 'in' });
 }
 function buildBackspace() {
@@ -994,7 +1039,7 @@ async function buildCheck() {
     // tiles are easier than typing: Build It can grow a word up to a bud, Spell It makes it bloom
     if (S.attempt === 1 && r.b < 2) r.b++;
     r.last = Date.now(); save();
-    S.marks[S.i] = 's' + stars; S.results.push({ w: w.w, stars });
+    S.marks[S.i] = 's' + stars; S.results.push({ w: w.w, stars }); setMood('happy');
     const ok = {}; S.w.split('').forEach((_, k) => ok[k] = 'ok dance'); S.locked = S.locked.map(() => true); renderBuild(ok);
     const praise = stars === 3 ? pick(P3) : stars === 2 ? pick(P2) : pick(P1);
     fb.className = 'feedback good'; fb.textContent = praise;
@@ -1008,7 +1053,7 @@ async function buildCheck() {
     if (S.i < S.words.length - 1) { S.i++; buildShow(); } else endBuild();
     return;
   }
-  r.miss++; r.last = Date.now(); save(); sfx.soft();
+  r.miss++; r.last = Date.now(); save(); sfx.soft(); setMood('sad');
   const marks = {}; S.slots.forEach((v, k) => { if (!S.locked[k]) marks[k] = S.tray[v].c === S.w[k] ? 'ok' : 'no'; });
   renderBuild(marks);
   if (S.attempt < 2) {
@@ -1100,11 +1145,11 @@ async function challengeCheck() {
   renderScore(); dots($('#spellDots'), S.words.length, S.i, S.marks);
   let msg;
   if (right) {
-    msg = pick(CH_RIGHT); toast(`✅ ${msg}`); sfx.good();
+    msg = pick(CH_RIGHT); toast(`✅ ${msg}`); sfx.good(); setMood('happy');
     const c = $('#scoreRight'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
   } else {
     // wrong answers stay quiet; the misses are shown at the end
-    msg = pick(CH_NEXT); sfx.tap();
+    msg = pick(CH_NEXT); sfx.tap(); setMood('sad');
     const fb = $('#spellFeedback'); fb.className = 'feedback tip'; fb.textContent = msg;
   }
   await sayIf(id, msg, { rate: 1 });

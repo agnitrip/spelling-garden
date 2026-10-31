@@ -10,6 +10,8 @@ A spelling practice game for young kids, built for iPad Safari (works on any mod
 
 Pick a look with 🎨 or on the Bee Challenge screen: Garden, Magic Castle, Kolkata, Christmas, or Halloween. Themes change the scenery and rewards, not the words.
 
+Two characters beside each word card cheer on right answers and look sad on wrong ones, and change with the theme.
+
 **No word lists are included.** A grown-up adds words on the device (press and hold ⚙️): paste them or load a `.txt` file. Format:
 
 ```
