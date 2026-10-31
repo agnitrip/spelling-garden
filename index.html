@@ -76,9 +76,6 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .iconbtn{width:56px;height:56px;border-radius:50%;border:0;background:rgba(255,255,255,.88);
   font-size:28px;display:grid;place-items:center;box-shadow:0 4px 0 rgba(43,45,66,.12);color:var(--ink);position:relative;cursor:pointer}
 .iconbtn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(43,45,66,.12)}
-.hold-ring{position:absolute;top:-4px;right:-4px;bottom:-4px;left:-4px;border-radius:50%;
-  background:conic-gradient(var(--violet) calc(var(--p,0)*1turn),transparent 0);
-  -webkit-mask:radial-gradient(circle,transparent 27px,#000 28px);mask:radial-gradient(circle,transparent 27px,#000 28px)}
 
 .screen{display:none;flex:1;flex-direction:column;align-items:center;min-height:0;position:relative}
 .screen.on{display:flex;animation:fadein .35s ease}
@@ -104,7 +101,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 /* home */
 .title{font-weight:700;font-size:clamp(40px,7.5vmin,84px);color:#fff;margin:1vh 0 0;letter-spacing:.5px;
   text-shadow:0 4px 0 var(--honey2),0 8px 18px rgba(0,0,0,.18);-webkit-text-stroke:2px var(--honey2)}
-.subtitle{font-size:clamp(18px,2.6vmin,28px);color:var(--sub);margin:.4vh 0 0;font-weight:500}
+.subtitle{font-size:clamp(18px,2.6vmin,28px);color:var(--ink);background:rgba(255,255,255,.85);padding:2px 16px;border-radius:999px;margin:.4vh 0 0;font-weight:500}
 .home-row{display:flex;align-items:center;gap:3vw;margin-top:2vh}
 .bee{width:clamp(110px,18vmin,190px);animation:bob 2.4s ease-in-out infinite}
 .bee .wing{transform-origin:60px 40px;animation:flap .18s ease-in-out infinite alternate}
@@ -224,6 +221,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .round-tabs{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:1.2vh}
 .round-tab{border:0;border-radius:18px;padding:8px 20px;font:inherit;font-weight:600;font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);line-height:1.15;cursor:pointer;
   background:rgba(255,255,255,.88);color:var(--ink);box-shadow:0 4px 0 rgba(43,45,66,.18)}
+.load-hint{margin-top:1vh;background:#fff}
 .round-tab small{display:block;font-weight:500;font-size:.72em;opacity:.8}
 .round-tab.on{background:var(--honey);color:#5a3500;box-shadow:0 0 0 3px #fff,0 4px 0 var(--honey2)}
 /* cheering characters: they sit at the card's sides, so tiles get the width between them */
@@ -337,7 +335,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <button class="chip player-chip" id="playerChip" aria-label="Change player">🔄 <span id="playerNameChip"></span></button>
     <div class="chip" id="listChip"><span class="ic">📚</span><span id="listName">No words yet</span></div>
     <button class="iconbtn" id="themeBtn" aria-label="Pick a theme">🎨</button>
-    <button class="iconbtn" id="gearBtn" aria-label="Grown-ups: press and hold">⚙️<span class="hold-ring" id="holdRing"></span></button>
+    <button class="iconbtn" id="gearBtn" aria-label="Grown-ups corner">⚙️</button>
   </header>
 
   <!-- WHO'S PLAYING -->
@@ -358,6 +356,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <h1 class="title">Spelling Garden</h1>
     <p class="subtitle" id="hello">Grow a flower for every word you learn!</p>
     <div class="round-tabs" id="roundTabs"></div>
+    <button class="round-tab load-hint" id="loadHint" hidden>📄 Load the word file to get 🐝 Medium Girl and 👑 Big Girl</button>
     <div class="home-row">
       <div id="homeBee"></div>
       <div class="mode-btns">
@@ -792,13 +791,14 @@ function renderHome() {
   renderHeader();
   $('#hello').textContent = (player ? `Hi ${player}! ` : '') + T().tag;
   const L = activeList(), g = $('#garden');
+  $('#loadHint').hidden = lists.some(l => LEVELS[l.id]);
   $('#roundTabs').innerHTML = lists.length > 1 ? lists.map((l, k) => {
     const P = prog(l.id), blooms = l.words.filter(({ w }) => stageOf(P[w]) === 3).length;
     return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}<small>${T().icon} ${blooms} / ${l.words.length}</small></button>`;
   }).join('') : '';
   $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
   if (!L) {
-    g.innerHTML = `<div class="empty-note" style="grid-column:1/-1">🌱 No words yet! Ask a grown-up to press and hold ⚙️ to add words.</div>`;
+    g.innerHTML = `<div class="empty-note" style="grid-column:1/-1">🌱 No words yet! Ask a grown-up to tap ⚙️ to add words.</div>`;
     $('#gardenCount').textContent = ''; return;
   }
   const P = prog(L.id); let blooms = 0;
@@ -1324,16 +1324,6 @@ function renderSetup() {
   renderHeader();
 }
 
-/* long-press gear */
-(function () {
-  const btn = $('#gearBtn'), ring = $('#holdRing'); let t0 = 0, raf2 = 0;
-  const HOLD = 1200;
-  const stop = () => { cancelAnimationFrame(raf2); ring.style.setProperty('--p', 0); t0 = 0; };
-  const loop = () => { const p = Math.min(1, (performance.now() - t0) / HOLD); ring.style.setProperty('--p', p); if (p >= 1) { stop(); openSetup(); } else raf2 = requestAnimationFrame(loop); };
-  btn.addEventListener('pointerdown', e => { e.preventDefault(); t0 = performance.now(); raf2 = requestAnimationFrame(loop); });
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
-  btn.addEventListener('contextmenu', e => e.preventDefault());
-})();
 function openSetup() { newRun(); renderSetup(); show('setup'); }
 
 /* ---------- wire up ---------- */
@@ -1349,6 +1339,8 @@ function startPlayer(name) {
 }
 function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome(); }
 $('#homeBtn').onclick = goHome;
+$('#gearBtn').onclick = () => { sfx.tap(); openSetup(); };
+$('#loadHint').onclick = () => { sfx.tap(); openSetup(); };
 $('#playerChip').onclick = () => { sfx.tap(); goWho(); };
 $('#whoForm').onsubmit = e => { e.preventDefault(); const n = $('#whoName').value.trim(); if (n) { $('#whoName').blur(); startPlayer(players.find(x => pKey(x) === pKey(n)) || n); } else $('#whoName').focus(); };
 $('#whoList').onclick = e => {
