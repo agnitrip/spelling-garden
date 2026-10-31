@@ -12,6 +12,8 @@ Pick a look with 🎨 or on the Bee Challenge screen: Garden, Magic Castle, Kolk
 
 Two characters beside each word card cheer on right answers and look sad on wrong ones, and change with the theme.
 
+Each session starts by asking who's playing. Every player has their own progress, honey, streak, and best scores on that device.
+
 **No word lists are included.** A grown-up adds words on the device (press and hold ⚙️): paste them or load a `.txt` file. Format:
 
 ```

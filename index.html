@@ -238,6 +238,13 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 @keyframes idle{50%{transform:translateY(-5px)}}
 @keyframes cheer{from{transform:translateY(0) rotate(-5deg) scale(1)}to{transform:translateY(-16px) rotate(5deg) scale(1.08)}}
 @keyframes sad{0%,100%{transform:translateY(8px) rotate(-2deg)}50%{transform:translateY(10px) rotate(2deg)}}
+.player-chip{border:0;font-family:inherit;color:var(--ink);cursor:pointer;padding:6px 16px;max-width:30vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.who-list{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-height:calc(var(--h,100vh)*.3);overflow:auto;padding:6px}
+.who-item{position:relative}
+.who-pick{border:0;border-radius:20px;background:var(--honey);color:#5a3500;font:inherit;font-weight:600;font-size:clamp(22px,calc(var(--h,100vh)*.04),32px);padding:12px 44px 12px 26px;box-shadow:0 6px 0 var(--honey2);cursor:pointer}
+.who-del{position:absolute;top:50%;right:8px;width:30px;height:30px;margin-top:-18px;border:0;border-radius:50%;background:rgba(255,255,255,.75);color:#5a3500;font-size:16px;cursor:pointer}
+.who-new{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+.who-new input{font:inherit;font-size:clamp(20px,calc(var(--h,100vh)*.034),28px);padding:12px 18px;border-radius:18px;border:3px solid #e3e6ef;min-width:min(320px,70vw);-webkit-user-select:text;user-select:text}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -327,10 +334,24 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="chip" id="honeyChip" title="Honey"><span class="ic">🍯</span><span id="honeyNum">0</span></div>
     <div class="chip" id="streakChip" title="Days in a row"><span class="ic">🔥</span><span id="streakNum">0</span></div>
     <div class="spacer"></div>
+    <button class="chip player-chip" id="playerChip" aria-label="Change player">🔄 <span id="playerNameChip"></span></button>
     <div class="chip" id="listChip"><span class="ic">📚</span><span id="listName">No words yet</span></div>
     <button class="iconbtn" id="themeBtn" aria-label="Pick a theme">🎨</button>
     <button class="iconbtn" id="gearBtn" aria-label="Grown-ups: press and hold">⚙️<span class="hold-ring" id="holdRing"></span></button>
   </header>
+
+  <!-- WHO'S PLAYING -->
+  <section class="screen" id="who">
+    <div class="card done-card" style="margin:auto 0">
+      <div id="whoBee"></div>
+      <div class="feedback good">Who’s playing today?</div>
+      <div class="who-list" id="whoList"></div>
+      <form class="who-new" id="whoForm">
+        <input type="text" id="whoName" placeholder="Type your name" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false">
+        <button class="btn green" type="submit">Let’s go! ➜</button>
+      </form>
+    </div>
+  </section>
 
   <!-- HOME -->
   <section class="screen" id="home">
@@ -439,8 +460,6 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <section class="screen" id="setup">
     <div class="card">
       <h2>⚙️ Grown-ups corner</h2>
-      <div class="row"><label for="playerName" style="font-weight:600">Player name</label>
-        <input type="text" id="playerName" placeholder="optional" maxlength="20" autocomplete="off"></div>
       <h2 style="font-size:22px">Word lists</h2>
       <p>Words stay on this device only. One word per line, with an optional sentence after a bar:
         <code>kite | My kite flew up high.</code> Tag each list with a line above its words: <code># Medium Girl</code>, <code># Big Girl</code>, or a new name like <code># Week 12</code>. One file can hold them all.
@@ -483,10 +502,20 @@ const store = {
 };
 let lists = store.get('lists', []);          // [{id,name,words:[{w,s}]}]
 let activeId = store.get('active', null);
-let progress = store.get('progress', {});    // {listId:{word:{b,seen,ok,miss,last}}}
-let honey = store.get('honey', 0);
-let streak = store.get('streak', { last: null, n: 0 });
-let player = store.get('player', '');
+// each player has their own progress, honey, streak, best scores and level
+let progress = {};                           // {listId:{word:{b,seen,ok,miss,last}}}
+let honey = 0, streak = { last: null, n: 0 }, bests = {}, player = '';
+const pKey = n => 'p.' + n.trim().toLowerCase();
+let players = store.get('players', null);
+if (players == null) {                       // first run after this update: keep what's on the device
+  const old = String(store.get('player', '')).trim(), data = store.get('progress', {});
+  players = [];
+  if (old || Object.keys(data).length) {
+    const nm = old || 'Player 1'; players = [nm];
+    store.set(pKey(nm), { progress: data, honey: store.get('honey', 0), streak: store.get('streak', { last: null, n: 0 }), best: store.get('best', {}), active: activeId });
+  }
+  store.set('players', players);
+}
 // the two Bee lists show as levels; ids stay the same so progress already on a device is kept
 const LEVELS = { '1st-grade-bee': { name: 'Medium Girl', icon: '🐝' }, '2nd-grade-bee': { name: 'Big Girl', icon: '👑' } };
 function nameLevels() { lists.forEach(l => { if (LEVELS[l.id]) l.name = LEVELS[l.id].name; }); }
@@ -494,7 +523,18 @@ const roundLabel = (l, k) => (LEVELS[l.id] ? `${LEVELS[l.id].icon} ${l.name}` : 
 nameLevels();
 const activeList = () => lists.find(l => l.id === activeId) || lists[0] || null;
 const prog = id => (progress[id] = progress[id] || {});
-const save = () => { store.set('lists', lists); store.set('active', activeId); store.set('progress', progress); store.set('honey', honey); store.set('streak', streak); store.set('player', player); };
+const save = () => {
+  store.set('lists', lists); store.set('active', activeId); store.set('players', players);
+  if (player) store.set(pKey(player), { progress, honey, streak, best: bests, active: activeId });
+};
+function loadPlayer(name) {
+  player = name;
+  const d = store.get(pKey(name), {});
+  progress = d.progress || {}; honey = d.honey || 0; streak = d.streak || { last: null, n: 0 }; bests = d.best || {};
+  if (d.active && lists.some(l => l.id === d.active)) activeId = d.active;
+  if (!players.some(n => pKey(n) === pKey(name))) players.push(name);
+  save();
+}
 
 /* ---------- themes: only the look changes, never the words ---------- */
 const THEMES = {
@@ -731,13 +771,15 @@ function tipFor(w) {
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   $('#homeBtn').style.display = id === 'home' ? 'none' : '';
-  $('#themeBtn').style.display = id === 'home' ? '' : 'none';
+  $('#themeBtn').style.display = $('#playerChip').style.display = id === 'home' ? '' : 'none';
+  document.querySelector('header').style.visibility = id === 'who' ? 'hidden' : '';
 }
 function bumpHoney(add) {
-  honey += add; $('#honeyNum').textContent = honey;
+  honey += add; save(); $('#honeyNum').textContent = honey;
   const c = $('#honeyChip'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
 }
 function renderHeader() {
+  $('#playerNameChip').textContent = player;
   $('#honeyNum').textContent = honey;
   const today = dayKey(0), yest = dayKey(-1);
   $('#streakNum').textContent = (streak.last === today || streak.last === yest) ? streak.n : 0;
@@ -1123,7 +1165,7 @@ function renderChIntro() {
   const n = Math.min(20, L.words.length); $('#chCount').textContent = n; $('#chWords').textContent = n === 1 ? 'word' : 'words';
   $('#chRounds').innerHTML = lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}</button>`).join('') : '';
   $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
-  const best = (store.get('best', {}))[L.id];
+  const best = bests[L.id];
   $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') : '';
 }
 function roundName() { return theme === 'garden' ? 'the Bee Challenge' : `the ${T().name} round`; }
@@ -1192,9 +1234,9 @@ function endChallenge() {
   newRun(); stopClock();
   const ms = timerOn ? Date.now() - clockT0 : 0;
   const n = S.results.length, score = S.results.filter(r => r.right).length, misses = S.results.filter(r => !r.right);
-  const bests = store.get('best', {}), prev = bests[S.list.id];
+  const prev = bests[S.list.id];
   const record = !prev || score > prev.score || (score === prev.score && ms && (!prev.ms || ms < prev.ms));
-  if (record) { bests[S.list.id] = { score, n, ms }; store.set('best', bests); }
+  if (record) { bests[S.list.id] = { score, n, ms }; }
   const today = dayKey(0);
   if (streak.last !== today) { streak.n = streak.last === dayKey(-1) ? streak.n + 1 : 1; streak.last = today; }
   const earned = score * 3 + (score === n ? 10 : 0);
@@ -1272,7 +1314,6 @@ function doImport(text) {
   $('#importText').value = '';
 }
 function renderSetup() {
-  $('#playerName').value = player;
   $('#listPick').innerHTML = lists.length ? lists.map(l => `<button class="list-pill ${l.id === (activeList() || {}).id ? 'on' : ''}" data-id="${l.id}">${l.name} · ${l.words.length}</button>`).join('') : '<p>No lists yet.</p>';
   const L = activeList();
   if (L) {
@@ -1296,8 +1337,25 @@ function renderSetup() {
 function openSetup() { newRun(); renderSetup(); show('setup'); }
 
 /* ---------- wire up ---------- */
+function goWho() {
+  newRun(); stopClock(); S = null; player = ''; progress = {}; honey = 0; bests = {};
+  $('#whoName').value = ''; $('#whoBee').innerHTML = beeSVG();
+  $('#whoList').innerHTML = players.map(n => `<div class="who-item"><button type="button" class="who-pick" data-n="${esc(n)}">${esc(n)}</button><button type="button" class="who-del" data-n="${esc(n)}" aria-label="Remove ${esc(n)}">✕</button></div>`).join('');
+  show('who');
+}
+function startPlayer(name) {
+  actx(); sfx.bloom(); loadPlayer(name); goHome();
+  const id = newRun(); sayIf(id, `Hi ${name}! Let's spell!`, { rate: 0.95, pitch: 1.12 });
+}
 function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome(); }
 $('#homeBtn').onclick = goHome;
+$('#playerChip').onclick = () => { sfx.tap(); goWho(); };
+$('#whoForm').onsubmit = e => { e.preventDefault(); const n = $('#whoName').value.trim(); if (n) { $('#whoName').blur(); startPlayer(players.find(x => pKey(x) === pKey(n)) || n); } else $('#whoName').focus(); };
+$('#whoList').onclick = e => {
+  const del = e.target.closest('.who-del'), go = e.target.closest('.who-pick');
+  if (del) { const n = del.dataset.n; if (!confirm(`Remove ${n} and all of their progress?`)) return; players = players.filter(x => x !== n); try { localStorage.removeItem('sg.' + pKey(n)); } catch {} store.set('players', players); goWho(); }
+  else if (go) startPlayer(go.dataset.n);
+};
 $('#roundTabs').onclick = e => { const b = e.target.closest('.round-tab'); if (!b || b.dataset.id === activeId) return; actx(); sfx.bloom(); activeId = b.dataset.id; save(); renderHome(); };
 $('#learnBtn').onclick = () => { actx(); sfx.tap(); startLearn(); };
 $('#spellBtn').onclick = () => { actx(); sfx.tap(); startSpell(); };
@@ -1318,13 +1376,12 @@ $('#importFile').onchange = e => { const f = e.target.files[0]; if (!f) return; 
 $('#listPick').onclick = e => { const b = e.target.closest('.list-pill'); if (!b) return; activeId = b.dataset.id; save(); renderSetup(); };
 $('#deleteList').onclick = () => { const L = activeList(); if (!L || !confirm(`Remove “${L.name}”? Its progress is deleted too.`)) return; lists = lists.filter(l => l.id !== L.id); delete progress[L.id]; activeId = lists[0] ? lists[0].id : null; save(); renderSetup(); };
 $('#resetProg').onclick = () => { const L = activeList(); if (!L || !confirm(`Reset all progress for “${L.name}”?`)) return; progress[L.id] = {}; save(); renderSetup(); };
-$('#playerName').oninput = e => { player = e.target.value.trim(); save(); };
 $('#setupDone').onclick = goHome;
 
 addEventListener('resize', () => { if ($('#home').classList.contains('on')) renderHome(); });
 applyTheme();
 buildKB();
-goHome();
+goWho();
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
