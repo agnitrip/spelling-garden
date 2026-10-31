@@ -186,6 +186,36 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .clock{font-variant-numeric:tabular-nums}
 .res.miss{background:#fff1d6}
 .res .fix{color:var(--good2);font-weight:600}
+/* live score, toasts, podium */
+.chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
+.chip.score.good{color:var(--good2)}
+.chip.score.bump{animation:bump .5s}
+.toast{position:fixed;top:clamp(60px,calc(var(--h,100vh)*.1),90px);left:50%;z-index:45;pointer-events:none;background:var(--good);color:#fff;
+  font-weight:600;font-size:clamp(22px,calc(var(--h,100vh)*.04),34px);padding:10px 28px;border-radius:999px;box-shadow:0 6px 0 var(--good2),0 12px 24px rgba(0,0,0,.18);
+  white-space:nowrap;transform:translateX(-50%);animation:toast 1.3s ease both}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-24px) scale(.8)}15%{opacity:1;transform:translate(-50%,0) scale(1.06)}25%{transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-14px)}}
+.big-toast{position:fixed;top:0;right:0;bottom:0;left:0;z-index:48;display:flex;align-items:center;justify-content:center;background:rgba(43,45,66,.55);padding:16px}
+.big-toast-card{background:var(--card);border-radius:36px;padding:clamp(18px,4vh,40px) clamp(24px,5vw,60px);text-align:center;box-shadow:0 12px 0 rgba(43,45,66,.2);animation:drop .6s cubic-bezier(.3,1.5,.5,1);max-width:min(640px,100%)}
+.bt-icon{font-size:clamp(70px,calc(var(--h,100vh)*.16),130px);line-height:1.1}
+.bt-title{font-size:clamp(32px,calc(var(--h,100vh)*.07),58px);font-weight:700;color:var(--honey2);margin:6px 0}
+.bt-sub{font-size:clamp(20px,calc(var(--h,100vh)*.035),30px);color:var(--soft);margin-bottom:20px}
+#done .done-card{gap:clamp(6px,1.2vh,14px);padding:clamp(10px,2vh,24px) 2vw;max-height:calc(var(--h,100vh) - 84px);overflow:auto}
+#done .big-score{font-size:clamp(40px,calc(var(--h,100vh)*.08),80px)}
+.podium{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.pod-top{display:flex;align-items:flex-end;justify-content:center;gap:10px}
+.pod{width:clamp(110px,16vw,160px);text-align:center}
+.pod .who{font-size:clamp(28px,calc(var(--h,100vh)*.05),42px);line-height:1}
+.pod .nm{font-size:clamp(15px,calc(var(--h,100vh)*.024),20px);font-weight:600;white-space:nowrap}
+.pod .blk{margin-top:4px;border-radius:12px 12px 0 0;color:#fff;font-weight:700;font-size:clamp(20px,calc(var(--h,100vh)*.035),30px);display:flex;flex-direction:column;justify-content:center;animation:rise .7s ease both}
+.pod.p1 .blk{height:clamp(70px,calc(var(--h,100vh)*.15),120px);background:#f5b700;animation-delay:.5s}
+.pod.p2 .blk{height:clamp(52px,calc(var(--h,100vh)*.11),90px);background:#9aa5b8;animation-delay:.25s}
+.pod.p3 .blk{height:clamp(40px,calc(var(--h,100vh)*.08),68px);background:#cd8a4b}
+.pod.me .nm{color:var(--violet2)}
+.pod.me .blk{box-shadow:0 0 0 4px var(--violet)}
+@keyframes rise{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
+.pod-rest{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pod-rest .res.me{box-shadow:0 0 0 3px var(--violet)}
+#doneList{max-height:calc(var(--h,100vh)*.16);overflow:auto}
 /* keyboard */
 .kb{width:min(1000px,100%);margin-top:auto;display:flex;flex-direction:column;flex:none;gap:clamp(5px,1vh,12px);padding-top:6px;padding-bottom:6px}
 .kb-row{display:flex;justify-content:center;gap:clamp(4px,.8vw,10px)}
@@ -234,6 +264,8 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
 </div>
 <canvas id="confetti"></canvas>
+<div class="toast" id="toast" hidden></div>
+<div class="big-toast" id="bigToast" hidden><div class="big-toast-card"><div class="bt-icon" id="btIcon"></div><div class="bt-title" id="btTitle"></div><div class="bt-sub" id="btSub"></div><button class="btn honey" id="btOk">See the podium ➜</button></div></div>
 
 <div id="app">
   <header>
@@ -310,7 +342,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 
   <!-- SPELL (also used by Bee Challenge) -->
   <section class="screen" id="spell">
-    <div class="topline"><div class="dots" id="spellDots"></div><div class="chip clock" id="clock" hidden>⏱️ <span id="clockNum">0:00</span></div></div>
+    <div class="topline"><div class="dots" id="spellDots"></div><div class="chip score" id="scoreDone" hidden>📝 <span id="scoreDoneNum">0/20</span></div><div class="chip score good" id="scoreRight" hidden>✅ <span id="scoreRightNum">0</span></div><div class="chip clock" id="clock" hidden>⏱️ <span id="clockNum">0:00</span></div></div>
     <div class="card play-card">
       <div class="prompt-row"><button class="speak-big" id="spellSpeak" aria-label="Hear the word">🔊</button><div class="sentence" id="spellSentence"></div></div>
       <div class="tiles" id="spellTiles"></div>
@@ -325,6 +357,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
       <div id="doneBee"></div>
       <div class="feedback good" id="doneTitle">Great job!</div>
       <div class="big-score" id="doneScore"></div>
+      <div class="podium" id="podium" hidden></div>
       <div class="sentence" id="doneSub"></div>
       <div class="result-row" id="doneList"></div>
       <div class="card-actions">
@@ -620,7 +653,7 @@ function endLearn() {
 function startSpell(words) {
   const L = activeList(); if (!L) return;
   S = { mode: 'spell', list: L, words: words ? shuffle(words) : pickWords(L, 10, false), i: 0, marks: [], results: [] };
-  show('spell'); stopClock(); $('#clock').hidden = true; spellShow();
+  show('spell'); stopClock(); $('#clock').hidden = $('#scoreDone').hidden = $('#scoreRight').hidden = true; spellShow();
 }
 function spellShow() {
   const w = S.words[S.i];
@@ -756,7 +789,8 @@ function endSpell() {
   sayIf(id, `${title.replace('!', '')}${nameBit()}! You got ${perfect} out of ${S.results.length} on the first try, and earned ${total} stars!`, { rate: 0.95, pitch: 1.12 });
 }
 function doneExtra(label, fn) { const b = $('#doneExtra'); b.hidden = !label; if (label) { b.textContent = label; b.onclick = fn; } }
-function fillBee(sel) { const el = $(sel); el.innerHTML = beeSVG(); el.firstChild.style.width = 'clamp(90px,14vmin,140px)'; }
+function toast(text) { const t = $('#toast'); t.hidden = true; void t.offsetWidth; t.textContent = text; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 1300); }
+function fillBee(sel) { $('#podium').hidden = true; const el = $(sel); el.innerHTML = beeSVG(); el.firstChild.style.width = 'clamp(90px,14vmin,140px)'; }
 
 /* ---------- BUILD IT ---------- */
 const DISTRACT = 'aeioubdmnprst';
@@ -908,23 +942,62 @@ function startChallenge() {
   const L = activeList(); if (!L) return;
   S = { mode: 'challenge', list: L, words: shuffle(L.words).slice(0, 20), i: 0, marks: [], results: [] };
   show('spell'); $('#clock').hidden = !timerOn; if (timerOn) startClock();
+  $('#scoreDone').hidden = $('#scoreRight').hidden = false; renderScore();
   spellShow();
 }
-const CH_NEXT = ['Got it!', 'Next word!', 'Okay!', 'Here comes the next one!', 'Keep going!'];
+const CH_RIGHT = ['Correct!', 'You got it!', 'Yes!', 'Super!', 'Well done!', 'Great spelling!'];
+const CH_NEXT = ['Nice try! Next word.', 'Keep going!', 'Here comes the next one!', 'On to the next one!'];
+function renderScore() {
+  const right = S.results.filter(r => r.right).length;
+  $('#scoreDoneNum').textContent = `${S.results.length}/${S.words.length}`;
+  $('#scoreRightNum').textContent = `${right} correct`;
+}
 async function challengeCheck() {
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join(''), right = guess === w.w;
   const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
   if (right) { r.b = Math.min(5, r.b + 1); r.ok++; } else { r.b = Math.max(0, r.b - 1); r.miss++; }
   r.last = Date.now(); save();
-  S.results.push({ w: w.w, guess, right }); S.marks[S.i] = 'seen';
-  // no right/wrong during the round, just like the real Bee
-  sfx.tap(); const msg = pick(CH_NEXT);
-  const fb = $('#spellFeedback'); fb.className = 'feedback tip'; fb.textContent = msg;
+  S.results.push({ w: w.w, guess, right }); S.marks[S.i] = right ? 's3' : 'seen';
+  renderScore(); dots($('#spellDots'), S.words.length, S.i, S.marks);
+  let msg;
+  if (right) {
+    msg = pick(CH_RIGHT); toast(`✅ ${msg}`); sfx.good();
+    const c = $('#scoreRight'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
+  } else {
+    // wrong answers stay quiet; the misses are shown at the end
+    msg = pick(CH_NEXT); sfx.tap();
+    const fb = $('#spellFeedback'); fb.className = 'feedback tip'; fb.textContent = msg;
+  }
   await sayIf(id, msg, { rate: 1 });
-  await wait(250); if (id !== runId) return;
+  await wait(right ? 500 : 250); if (id !== runId) return;
   if (S.i < S.words.length - 1) { S.i++; spellShow(); } else endChallenge();
 }
+/* the bots stay close to her last best, so the race is close and they improve as she does */
+const BOTS = [['Chithi bonu', '🦋'], ['Chhuti didi', '🐞'], ['Bhai', '🐸'], ['Dibhai', '🦊']];
+function botScores(n, prev) {
+  const base = prev ? prev.score / prev.n : 0.7;
+  const offs = shuffle([-0.2, -0.08, 0.02, 0.12]);
+  return BOTS.map(([name, icon], k) => {
+    const p = Math.max(0.35, Math.min(0.97, base + offs[k])); let score = 0;
+    for (let i = 0; i < n; i++) if (Math.random() < p) score++;
+    return { name, icon, score };
+  });
+}
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function renderPodium(table) {
+  const pod = (p, place) => `<div class="pod p${place} ${p.me ? 'me' : ''}"><div class="who">${p.icon}</div><div class="nm">${esc(p.name)}</div><div class="blk">${['🥇', '🥈', '🥉'][place - 1]}<span>${p.score}</span></div></div>`;
+  $('#podium').innerHTML = `<div class="pod-top">${pod(table[1], 2)}${pod(table[0], 1)}${pod(table[2], 3)}</div>
+    <div class="pod-rest">${table.slice(3).map((p, k) => `<div class="res ${p.me ? 'me' : ''}">${k + 4}th ${p.icon} ${esc(p.name)} · ${p.score}</div>`).join('')}</div>`;
+  $('#podium').hidden = false;
+}
+const OUTCOME = [
+  { icon: '🏆', title: 'You’re the Champion!', sub: 'First place! You beat everyone!' },
+  { icon: '🥈', title: 'Second place!', sub: 'So close to the top!' },
+  { icon: '🥉', title: 'Third place!', sub: 'You made the podium!' },
+  { icon: '🌟', title: 'Great effort!', sub: 'Keep practising and you’ll climb the podium!' },
+  { icon: '🌱', title: 'Good try!', sub: 'Every round makes you stronger. Try again!' }
+];
 function endChallenge() {
   newRun(); stopClock();
   const ms = timerOn ? Date.now() - clockT0 : 0;
@@ -935,19 +1008,27 @@ function endChallenge() {
   const today = dayKey(0);
   if (streak.last !== today) { streak.n = streak.last === dayKey(-1) ? streak.n + 1 : 1; streak.last = today; }
   const earned = score * 3 + (score === n ? 10 : 0);
-  save(); show('done'); fillBee('#doneBee'); bumpHoney(earned); renderHeader();
-  const title = score === n ? '🏆 BEE CHAMPION!' : score >= n * .8 ? 'Amazing spelling!' : score >= n * .5 ? 'Great job!' : 'Good practice!';
-  $('#doneTitle').textContent = title;
+  // she goes first in the sort, so a tie goes her way
+  const table = [{ name: player || 'You', icon: '🐝', score, me: true }, ...botScores(n, prev)].sort((a, b) => b.score - a.score);
+  const rank = table.findIndex(p => p.me), out = OUTCOME[rank];
+  save(); show('done'); fillBee('#doneBee'); $('#doneBee').innerHTML = ''; bumpHoney(earned); renderHeader();
+  $('#doneTitle').textContent = `${out.icon} ${out.title}`;
   $('#doneScore').textContent = `${score} / ${n}`;
-  $('#doneSub').textContent = (record && prev ? 'New record! ' : '') + (ms ? `Time: ${fmt(ms)}. ` : '') + `You earned ${earned} honey drops! 🍯` + (misses.length ? ' Words to practice:' : '');
+  $('#doneSub').textContent = (record && prev ? 'New record! ' : '') + (ms ? `Time: ${fmt(ms)}. ` : '') + `+${earned} honey 🍯` + (misses.length ? ' · Words to practice:' : '');
   $('#doneList').innerHTML = misses.map(r => `<div class="res miss">${r.guess} → <span class="fix">${r.w}</span></div>`).join('');
+  renderPodium(table);
   if (misses.length) doneExtra('✏️ Practice my misses', () => startSpell(misses.map(m => S.list.words.find(x => x.w === m.w))));
   else doneExtra(null);
   $('#doneNext').textContent = '🏆 Try again'; $('#doneNext').onclick = () => openChallenge();
-  score === n ? (sfx.great(), confetti(320)) : (sfx.good(), confetti(score >= n * .8 ? 160 : 60));
+  // big outcome toast over the results
+  $('#btIcon').textContent = out.icon; $('#btTitle').textContent = out.title;
+  $('#btSub').textContent = `${score} out of ${n} correct. ${out.sub}`;
+  $('#bigToast').hidden = false;
+  rank === 0 ? (sfx.great(), confetti(320)) : rank <= 2 ? (sfx.great(), confetti(160)) : sfx.good();
   const id = newRun();
-  sayIf(id, `${title.replace(/[^a-zA-Z ]/g, '').trim()}${nameBit()}! You spelled ${score} out of ${n} words correctly${record && prev ? ', a new record' : ''}!`, { rate: 0.95, pitch: 1.12 });
+  sayIf(id, `${out.title.replace(/[^a-zA-Z' ]/g, '')}${nameBit()}! You spelled ${score} out of ${n} words correctly.${record && prev ? ' A new record!' : ''}`, { rate: 0.95, pitch: 1.12 });
 }
+$('#btOk').onclick = () => { $('#bigToast').hidden = true; newRun(); sfx.tap(); };
 
 /* ---------- keyboard ---------- */
 $('#spellTiles').addEventListener('pointerdown', e => { const t = e.target.closest('.tile'); if (t) clearSlot(+t.dataset.k); });
