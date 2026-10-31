@@ -221,6 +221,11 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .theme-card.on{box-shadow:0 0 0 5px var(--honey),0 6px 0 rgba(43,45,66,.2)}
 .theme-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .theme-pills .list-pill{font-size:clamp(16px,2.4vmin,20px);padding:8px 14px}
+.round-tabs{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:1.2vh}
+.round-tab{border:0;border-radius:18px;padding:8px 20px;font:inherit;font-weight:600;font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);line-height:1.15;cursor:pointer;
+  background:rgba(255,255,255,.88);color:var(--ink);box-shadow:0 4px 0 rgba(43,45,66,.18)}
+.round-tab small{display:block;font-weight:500;font-size:.72em;opacity:.8}
+.round-tab.on{background:var(--honey);color:#5a3500;box-shadow:0 0 0 3px #fff,0 4px 0 var(--honey2)}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -319,6 +324,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <section class="screen" id="home">
     <h1 class="title">Spelling Garden</h1>
     <p class="subtitle" id="hello">Grow a flower for every word you learn!</p>
+    <div class="round-tabs" id="roundTabs"></div>
     <div class="home-row">
       <div id="homeBee"></div>
       <div class="mode-btns">
@@ -694,6 +700,10 @@ function renderHome() {
   renderHeader();
   $('#hello').textContent = (player ? `Hi ${player}! ` : '') + T().tag;
   const L = activeList(), g = $('#garden');
+  $('#roundTabs').innerHTML = lists.length > 1 ? lists.map((l, k) => {
+    const P = prog(l.id), blooms = l.words.filter(({ w }) => stageOf(P[w]) === 3).length;
+    return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">Round ${k + 1}: ${esc(l.name)}<small>${T().icon} ${blooms} / ${l.words.length}</small></button>`;
+  }).join('') : '';
   $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
   if (!L) {
     g.innerHTML = `<div class="empty-note" style="grid-column:1/-1">🌱 No words yet! Ask a grown-up to press and hold ⚙️ to add words.</div>`;
@@ -1233,6 +1243,7 @@ function openSetup() { newRun(); renderSetup(); show('setup'); }
 /* ---------- wire up ---------- */
 function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome(); }
 $('#homeBtn').onclick = goHome;
+$('#roundTabs').onclick = e => { const b = e.target.closest('.round-tab'); if (!b || b.dataset.id === activeId) return; actx(); sfx.bloom(); activeId = b.dataset.id; save(); renderHome(); };
 $('#learnBtn').onclick = () => { actx(); sfx.tap(); startLearn(); };
 $('#spellBtn').onclick = () => { actx(); sfx.tap(); startSpell(); };
 $('#buildBtn').onclick = () => { actx(); sfx.tap(); startBuild(); };
