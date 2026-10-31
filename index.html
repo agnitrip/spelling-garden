@@ -443,7 +443,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
         <input type="text" id="playerName" placeholder="optional" maxlength="20" autocomplete="off"></div>
       <h2 style="font-size:22px">Word lists</h2>
       <p>Words stay on this device only. One word per line, with an optional sentence after a bar:
-        <code>kite | My kite flew up high.</code> Start a new list with a line like <code># Week 12</code>.
+        <code>kite | My kite flew up high.</code> Tag each list with a line above its words: <code># Medium Girl</code>, <code># Big Girl</code>, or a new name like <code># Week 12</code>. One file can hold them all.
         Commas work too: <code>cat, dog, sun</code>.</p>
       <textarea id="importText" placeholder="# My Words&#10;kite | My kite flew up high.&#10;green | The frog is green."></textarea>
       <div class="row">
@@ -1244,12 +1244,13 @@ function buildKB() {
 }
 
 /* ---------- grown-ups setup ---------- */
+const TAGS = { 'medium-girl': '1st-grade-bee', 'big-girl': '2nd-grade-bee' };
 function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'list'; }
 function parseLists(text) {
   const out = []; let cur = null, skipped = [];
   for (let line of text.split(/\r?\n/)) {
     line = line.trim(); if (!line) continue;
-    if (line.startsWith('#')) { const name = line.replace(/^#+\s*/, '') || 'My Words'; cur = { id: slug(name), name, words: [] }; out.push(cur); continue; }
+    if (line.startsWith('#')) { const name = line.replace(/^#+\s*/, '') || 'My Words'; cur = { id: TAGS[slug(name)] || slug(name), name, words: [] }; out.push(cur); continue; }
     if (!cur) { cur = { id: 'my-words', name: 'My Words', words: [] }; out.push(cur); }
     const items = line.includes('|') ? [line] : line.split(',');
     for (const it of items) {
