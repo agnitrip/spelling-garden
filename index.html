@@ -458,7 +458,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
   <!-- SETUP (grown-ups) -->
   <section class="screen" id="setup">
     <div class="card">
-      <h2>⚙️ Grown-ups corner</h2>
+      <div class="row" style="justify-content:space-between"><h2>⚙️ Grown-ups corner</h2><button class="btn honey small" id="setupDone">Done ✓</button></div>
       <h2 style="font-size:22px">Word lists</h2>
       <p>Words stay on this device only. One word per line, with an optional sentence after a bar:
         <code>kite | My kite flew up high.</code> Tag each list with a line above its words: <code># Medium Girl</code>, <code># Big Girl</code>, or a new name like <code># Week 12</code>. One file can hold them all.
@@ -467,7 +467,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
       <div class="row">
         <button class="btn green small" id="importBtn">➕ Add these words</button>
         <label class="btn ghost small" style="position:relative">📄 Load a file
-          <input type="file" id="importFile" accept=".txt,text/plain" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
+          <input type="file" id="importFile" title=" " accept=".txt,text/plain" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
       </div>
       <div class="msg" id="importMsg"></div>
       <h2 style="font-size:22px">Which list to practice</h2>
@@ -477,7 +477,6 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
         <button class="btn ghost small" id="deleteList">🗑️ Remove this list</button>
         <button class="btn ghost small" id="resetProg">↺ Reset its progress</button>
       </div>
-      <div class="row"><button class="btn honey" id="setupDone">Done ✓</button></div>
     </div>
   </section>
 </div>
@@ -1308,10 +1307,12 @@ function doImport(text) {
   if (!got.length) { $('#importMsg').textContent = 'No words found. One word per line, please.'; return; }
   for (const l of got) { const i = lists.findIndex(x => x.id === l.id); if (i >= 0) lists[i] = l; else lists.push(l); }
   nameLevels();
-  if (!activeList() || !lists.some(l => l.id === activeId)) activeId = got[0].id;
+  activeId = got[0].id;                      // show the words just loaded
   save(); renderSetup();
   $('#importMsg').textContent = `Added: ${got.map(l => `${(LEVELS[l.id] || l).name} (${l.words.length} words)`).join(', ')}` + (skipped.length ? `. Skipped (letters only): ${skipped.join(', ')}` : '');
   $('#importText').value = '';
+  // done: go to the new words, unless a skipped word needs a grown-up to see the note
+  if (!skipped.length) { goHome(); sfx.bloom(); toast(`✅ Added ${got.map(l => (LEVELS[l.id] || l).name).join(' and ')}`); }
 }
 function renderSetup() {
   $('#listPick').innerHTML = lists.length ? lists.map(l => `<button class="list-pill ${l.id === (activeList() || {}).id ? 'on' : ''}" data-id="${l.id}">${l.name} · ${l.words.length}</button>`).join('') : '<p>No lists yet.</p>';
