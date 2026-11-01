@@ -107,10 +107,13 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .bee .wing{transform-origin:60px 40px;animation:flap .18s ease-in-out infinite alternate}
 @keyframes bob{50%{transform:translateY(-14px) rotate(-3deg)}}
 @keyframes flap{to{transform:scaleY(.6)}}
-.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:20px 18px}
-.mode-btns .btn{min-width:min(300px,36vw);justify-content:flex-start;font-size:clamp(20px,3vmin,32px);text-align:left}
-.mode-btns .btn small{display:block;font-size:.5em;font-weight:500;opacity:.9}
-.mode-btns .btn .em{font-size:1.4em}
+.mode-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 12px;width:min(640px,74vw)}
+.mode-btns .btn{justify-content:center;font-size:clamp(16px,calc(var(--h,100vh)*.024),21px);text-align:left;padding:.5em .6em;gap:.3em;border-radius:20px}
+.mode-btns .btn .em{font-size:1.3em}
+.mode-btns #challengeBtn{grid-column:1/-1;font-size:clamp(28px,calc(var(--h,100vh)*.052),44px);padding:.45em .8em;border-radius:28px;animation:btnpulse 2.4s ease-in-out infinite}
+.mode-btns #challengeBtn small{font-size:.48em}
+.mode-btns .btn small{display:none;font-size:.5em;font-weight:500;opacity:.9}
+.mode-btns #challengeBtn small{display:block}
 
 .meadow{margin-top:auto;width:min(1000px,100%);background:var(--meadow-bg);border-radius:28px;
   padding:12px 16px 10px;backdrop-filter:blur(2px)}
@@ -316,7 +319,6 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 
 @media (orientation:portrait){
   .home-row{flex-direction:column;gap:1vh}
-  .mode-btns .btn{min-width:min(330px,44vw)}
 }
 @media (max-height:700px){ .card{padding:2vh 2vw;gap:1.2vh} }
 </style>
@@ -367,10 +369,10 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="home-row">
       <div id="homeBee"></div>
       <div class="mode-btns">
+        <button class="btn honey" id="challengeBtn"><span class="em">🏆</span><span>Bee Challenge<small>5 levels, 20 words each, no hints</small></span></button>
         <button class="btn pink" id="learnBtn"><span class="em">👂</span><span>Listen &amp; Learn<small>Hear it, see it, say it</small></span></button>
         <button class="btn" id="buildBtn"><span class="em">🧩</span><span>Build It<small>Put the letter tiles in order</small></span></button>
         <button class="btn green" id="spellBtn"><span class="em">✏️</span><span>Spell It!<small>Hear the word, spell it yourself</small></span></button>
-        <button class="btn honey" id="challengeBtn"><span class="em">🏆</span><span>Bee Challenge<small>5 levels, 20 words each, no hints</small></span></button>
       </div>
     </div>
     <div class="meadow">
@@ -517,7 +519,7 @@ let activeId = store.get('active', null);
 // each player has their own progress, honey, streak, best scores and level
 let progress = {};                           // {listId:{word:{b,seen,ok,miss,last}}}
 let honey = 0, streak = { last: null, n: 0 }, bests = {}, player = '';
-let stats = {}, rounds = [], chLevel = 1;      // stats {word:{r,w}}, rounds [{lvl,score,n,t}]: kept until Start over
+let stats = {}, rounds = [], chLevel = 1;      // stats {word:{r first try, f fixed on 2nd try, w stayed wrong}}, rounds [{lvl,score,n,t}]: kept until Start over
 const pKey = n => 'p.' + n.trim().toLowerCase();
 let players = store.get('players', null);
 if (players == null) {                       // first run after this update: keep what's on the device
@@ -950,7 +952,7 @@ async function check() {
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join('');
   const P = prog(w.lid || S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
-  if (S.attempt === 1 && !S.copy) tally(w.w, guess === w.w);   // first try is the fair count
+  if (!S.copy) tallyTry(w.w, guess === w.w, S.attempt);
   if (guess === w.w) {
     let stars = S.copy ? 1 : S.attempt === 1 ? 3 : 2;
     if (S.attempt === 1 && !S.copy) { r.b = Math.min(5, r.b + 1); r.ok++; }
@@ -1036,7 +1038,9 @@ function doneExtra(label, fn) { const b = $('#doneExtra'); b.hidden = !label; if
 function toast(text) { const t = $('#toast'); t.hidden = true; void t.offsetWidth; t.textContent = text; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 1300); }
 function fillBee(sel) { $('#podium').hidden = true; const el = $(sel); el.innerHTML = beeSVG(); el.firstChild.style.width = 'clamp(90px,14vmin,140px)'; }
 
-function tally(word, ok) { const t = stats[word] = stats[word] || { r: 0, w: 0 }; ok ? t.r++ : t.w++; }
+function tally(word, k) { const t = stats[word] = stats[word] || { r: 0, f: 0, w: 0 }; t[k] = (t[k] || 0) + 1; }
+// a first miss isn't scored yet: the second try decides between "fixed" and "wrong"
+function tallyTry(word, ok, attempt) { if (ok) tally(word, attempt === 1 ? 'r' : 'f'); else if (attempt > 1) tally(word, 'w'); }
 
 /* ---------- BUILD IT ---------- */
 const DISTRACT = 'aeioubdmnprst';
@@ -1101,7 +1105,7 @@ async function buildCheck() {
   const guess = S.slots.map(v => S.tray[v].c).join('');
   const P = prog(S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
   const fb = $('#buildFeedback');
-  if (S.attempt === 1) tally(w.w, guess === w.w);
+  if (S.attempt < 3) tallyTry(w.w, guess === w.w, S.attempt);
   if (guess === w.w) {
     const stars = S.attempt === 1 ? 3 : S.attempt === 2 ? 2 : 1;
     // tiles are easier than typing: Build It can grow a word up to a bud, Spell It makes it bloom
@@ -1209,7 +1213,7 @@ function openChallenge() {
 function startChallenge() {
   const L = activeList(); if (!L) return;
   const lv = levelMode();
-  S = { mode: 'challenge', phase: 1, queue: [], seen: 0, list: L, level: lv ? chLevel : 0, words: shuffle(lv ? levelSets()[chLevel - 1] : L.words).slice(0, 20), i: 0, marks: [], results: [] };
+  S = { mode: 'challenge', phase: 1, queue: [], seen: 0, firstWrong: new Set(), list: L, level: lv ? chLevel : 0, words: shuffle(lv ? levelSets()[chLevel - 1] : L.words).slice(0, 20), i: 0, marks: [], results: [] };
   show('spell'); $('#clock').hidden = !timerOn; if (timerOn) startClock();
   $('#scoreDone').hidden = $('#scoreRight').hidden = false; renderScore();
   spellShow();
@@ -1224,7 +1228,8 @@ async function challengeCheck() {
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join(''), right = guess === w.w;
   const P = prog(w.lid || S.list.id); const r = P[w.w] = P[w.w] || { b: 0, seen: 0, ok: 0, miss: 0, last: 0 };
-  tally(w.w, right);
+  if (S.phase === 1 && !right) S.firstWrong.add(w.w);
+  else tallyTry(w.w, right, S.firstWrong.has(w.w) ? 2 : right ? 1 : 2);   // skipped, then right, is still a first try
   if (right) { r.b = Math.min(5, r.b + 1); r.ok++; } else { r.b = Math.max(0, r.b - 1); r.miss++; }
   r.last = Date.now(); save();
   if (S.phase === 1) S.seen++;
@@ -1278,7 +1283,7 @@ $('#chAct').onclick = () => {
   if (S.await) { S.await = false; challengeNext(); return; }
   if (S.busy) return;
   if (S.phase === 1) { S.queue.push(S.i); S.marks[S.i] = 's1'; S.seen++; newRun(); challengeNext(); return; }
-  S.busy = true; tally(S.w, false); save(); challengeExplain(newRun(), '');                                  // end round: stuck counts as a drop
+  S.busy = true; tally(S.w, 'w'); save(); challengeExplain(newRun(), '');                                  // end round: stuck counts as a drop
 };
 /* the bots stay close to her last best, so the race is close and they improve as she does */
 const BOTS = [['Chithi bonu', '🦋'], ['Chhuti didi', '🐞'], ['Bhai', '🐸'], ['Dibhai', '🦊']];
@@ -1416,18 +1421,18 @@ function renderReport() {
   $('#startOver').textContent = `↺ Start over for ${reportName}`; $('#removePlayer').textContent = `🗑️ Remove ${reportName}`;
   const d = store.get(pKey(reportName), {}), st = d.stats || {}, bs = d.best || {}, log = d.rounds || [], sets = levelSets();
   const table = words => {
-    const rows = words.map(w => ({ w, r: (st[w] || {}).r || 0, x: (st[w] || {}).w || 0 })).sort((a, b) => b.x - a.x || b.r - a.r || (a.w < b.w ? -1 : 1));
-    return `<table class="report"><tr><th>Word</th><th class="n">✅ Right</th><th class="n">❌ Wrong</th></tr>${rows.map(o => `<tr><td>${esc(o.w)}</td><td class="n">${o.r}</td><td class="n">${o.x}</td></tr>`).join('')}</table>`;
+    const rows = words.map(w => { const t = st[w] || {}; return { w, r: t.r || 0, f: t.f || 0, x: t.w || 0 }; }).sort((a, b) => b.x - a.x || b.f - a.f || b.r - a.r || (a.w < b.w ? -1 : 1));
+    return `<table class="report"><tr><th>Word</th><th class="n">✅ First try</th><th class="n">🔁 Fixed on 2nd try</th><th class="n">❌ Wrong</th></tr>${rows.map(o => `<tr><td>${esc(o.w)}</td><td class="n">${o.r}</td><td class="n">${o.f}</td><td class="n">${o.x}</td></tr>`).join('')}</table>`;
   };
   let h = '', seen = new Set();
   (sets || []).forEach((set, i) => {
-    const n = i + 1, b = bs['L' + n], plays = log.filter(r => r.lvl === n).length, right = set.filter(w => (st[w.w] || {}).r).length, wrong = set.reduce((a, w) => a + ((st[w.w] || {}).w || 0), 0);
+    const n = i + 1, b = bs['L' + n], plays = log.filter(r => r.lvl === n).length, sum = k => set.reduce((a, w) => a + ((st[w.w] || {})[k] || 0), 0);
     set.forEach(w => seen.add(w.w));
-    h += `<details><summary>${unlocked(n, bs) ? THEMES[RL[i]].icon : '🔒'} Level ${n}: best ${b ? `${b.score}/${b.n}` : 'not played'} · played ${plays}× · ${right}/${set.length} words right at least once · ${wrong} misses</summary>${table(set.map(w => w.w))}</details>`;
+    h += `<details><summary>${unlocked(n, bs) ? THEMES[RL[i]].icon : '🔒'} Level ${n}: best ${b ? `${b.score}/${b.n}` : 'not played'} · played ${plays}× · ✅ ${sum('r')} · 🔁 ${sum('f')} · ❌ ${sum('w')}</summary>${table(set.map(w => w.w))}</details>`;
   });
   const other = Object.keys(st).filter(w => !seen.has(w));
   if (other.length) h += `<details><summary>Other words: ${other.length}</summary>${table(other)}</details>`;
-  $('#report').innerHTML = h || '<p>No words loaded yet.</p>';
+  $('#report').innerHTML = h ? `<p>✅ right on the first try · 🔁 wrong, then fixed on the second try · ❌ still wrong. Tap a level to see each word.</p>${h}` : '<p>No words loaded yet.</p>';
 }
 function openSetup() { newRun(); save(); reportName = player; renderSetup(); renderReport(); show('setup'); }
 $('#reportWho').onclick = e => { const b = e.target.closest('.list-pill'); if (b) { reportName = b.dataset.n; renderReport(); } };
