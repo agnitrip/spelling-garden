@@ -14,24 +14,26 @@
 <title>Spelling Garden</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --sky1:#7cc8f5; --sky2:#d6f1ff; --grass:#86d65f; --grass2:#5fb843; --grass3:#4a9a33;
-  --honey:#ffb627; --honey2:#f08c00; --ink:#2b2d42; --soft:#5c6078; --card:#fffdf6;
-  --good:#22b573; --good2:#178a57; --bad:#ff6b6b; --hint:#ff9f1c; --violet:#8e6cff; --violet2:#6a48e0;
-  --pink:#ff7eb6; --pink2:#e0569a;
+  --honey:#ffb627; --honey2:#e8930a; --ink:#22243a; --soft:#62667c; --card:#fff; --line:#e4e5ed; --track:#eef0f5;
+  --display:"Fredoka",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
+  --s1:0 1px 2px rgba(34,36,58,.1); --s2:0 1px 2px rgba(34,36,58,.08),0 6px 16px rgba(34,36,58,.08); --s3:0 2px 6px rgba(34,36,58,.1),0 18px 44px rgba(34,36,58,.18);
+  --good:#1fa96a; --good2:#15804f; --bad:#ec5a5a; --hint:#f08c00; --violet:#5d50d6; --violet2:#4438ad;
+  --pink:#5d50d6; --pink2:#4438ad;
   --hill1:#5fb843; --hill2:#86d65f; --hill3a:#9be16f; --hill3b:#86d65f;
-  --sub:#24527a; --meadow-bg:rgba(255,255,255,.35); --meadow-ink:#1f4d2b; --ring:transparent; --card-t:#fffdf6; --deco:"";
+  --sub:#24527a;
 }
 html[data-theme=castle]{--sky1:#3b1f7a;--sky2:#d67fc4;--hill1:#7a4fc4;--hill2:#9a6fe0;--hill3a:#c79bf0;--hill3b:#a97fe8;
-  --sub:#fff0fb;--meadow-bg:rgba(255,255,255,.72);--meadow-ink:#4a2a8a;--ring:#c79bf0;--card-t:#fdf6ff;--deco:"✨"}
+  --sub:#fff0fb}
 html[data-theme=kolkata]{--sky1:#f08a3c;--sky2:#ffd9a0;--hill1:#2f7f8f;--hill2:#2f7f8f;--hill3a:#3f9aaa;--hill3b:#2f7f8f;
-  --sub:#5a2500;--meadow-bg:rgba(255,255,255,.72);--meadow-ink:#5a2500;--ring:#ffc21a;--card-t:#fffaf0;--deco:"🚕"}
+  --sub:#5a2500}
 html[data-theme=christmas]{--sky1:#0d2350;--sky2:#2f5f9e;--hill1:#dce9f5;--hill2:#eef5fb;--hill3a:#ffffff;--hill3b:#e6f0f8;
-  --sub:#e6f3ff;--meadow-bg:rgba(255,255,255,.78);--meadow-ink:#13406b;--ring:#d62839;--card-t:#fffdf8;--deco:"🎄"}
+  --sub:#e6f3ff}
 html[data-theme=halloween]{--sky1:#1a0b2e;--sky2:#6a2c91;--hill1:#2a1a3e;--hill2:#3a2452;--hill3a:#4a2f63;--hill3b:#3a2452;
-  --sub:#ffd9a8;--meadow-bg:rgba(255,255,255,.72);--meadow-ink:#4a1f6b;--ring:#ff7a18;--card-t:#fff8ef;--deco:"🎃"}
+  --sub:#ffd9a8}
 html[data-theme=castle] .cloud,html[data-theme=christmas] .cloud,html[data-theme=halloween] .cloud{display:none}
 html[data-theme=castle] .sun,html[data-theme=christmas] .sun{background:radial-gradient(circle,#fff 0%,#fdf6d0 70%,#f2e7b0 100%);box-shadow:0 0 50px 12px rgba(255,250,210,.45)}
 html[data-theme=halloween] .sun{width:26vmin;height:26vmin;background:radial-gradient(circle,#ffd27a 0%,#ff9d2e 65%,#f07a12 100%);box-shadow:0 0 70px 24px rgba(255,140,40,.5)}
@@ -39,7 +41,7 @@ html[data-theme=halloween] .sun{width:26vmin;height:26vmin;background:radial-gra
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;overflow:hidden}
 body{
-  font-family:"Fredoka",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
+  font-family:"Nunito",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;font-weight:600;
   color:var(--ink);
   background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 62%,#eafaff 100%);
   -webkit-user-select:none;user-select:none;touch-action:manipulation;
@@ -67,101 +69,110 @@ body{
 #app{position:relative;z-index:1;height:var(--h,100vh);display:flex;flex-direction:column;
   padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
 header{display:flex;align-items:center;gap:10px;min-height:56px}
-.chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.88);border-radius:999px;
-  padding:6px 16px 6px 10px;font-weight:600;font-size:clamp(18px,2.4vmin,26px);box-shadow:0 4px 0 rgba(43,45,66,.12)}
-.chip .ic{font-size:1.2em}
+svg.i{width:1.15em;height:1.15em;flex:none;display:block;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chip{display:flex;align-items:center;gap:6px;background:#fff;border-radius:12px;height:44px;
+  padding:0 14px 0 10px;font-weight:800;font-size:17px;box-shadow:var(--s1)}
+.chip .ic{display:flex;font-size:18px}
+#honeyChip .ic{color:var(--honey)} #streakChip .ic{color:#ef6a2e}
 .chip.bump{animation:bump .5s}
-@keyframes bump{40%{transform:scale(1.25)}}
+@keyframes bump{40%{transform:scale(1.15)}}
 .spacer{flex:1}
-.iconbtn{width:56px;height:56px;border-radius:50%;border:0;background:rgba(255,255,255,.88);
-  font-size:28px;display:grid;place-items:center;box-shadow:0 4px 0 rgba(43,45,66,.12);color:var(--ink);position:relative;cursor:pointer}
-.iconbtn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(43,45,66,.12)}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:0;background:#fff;
+  font-size:19px;display:grid;place-items:center;box-shadow:var(--s1);color:var(--ink);position:relative;cursor:pointer}
+.iconbtn:active{background:var(--track)}
 
 .screen{display:none;flex:1;flex-direction:column;align-items:center;min-height:0;position:relative}
 .screen.on{display:flex;animation:fadein .35s ease}
 @keyframes fadein{from{opacity:0;transform:translateY(12px)}}
 
-.btn{font-family:inherit;border:0;border-radius:28px;cursor:pointer;color:#fff;font-weight:600;
-  font-size:clamp(22px,3.4vmin,36px);padding:.55em 1.3em;display:inline-flex;align-items:center;gap:.4em;
-  background:var(--violet);box-shadow:0 8px 0 var(--violet2);transition:transform .08s}
-.btn:active{transform:translateY(6px);box-shadow:0 2px 0 var(--violet2)}
-.btn.green{background:var(--good);box-shadow:0 8px 0 var(--good2)}
-.btn.green:active{box-shadow:0 2px 0 var(--good2)}
-.btn.pink{background:var(--pink);box-shadow:0 8px 0 var(--pink2)}
-.btn.pink:active{box-shadow:0 2px 0 var(--pink2)}
-.btn.honey{background:var(--honey);box-shadow:0 8px 0 var(--honey2);color:#5a3500}
-.btn.honey:active{box-shadow:0 2px 0 var(--honey2)}
-.btn.ghost{background:#fff;color:var(--ink);box-shadow:0 8px 0 #c9cfdc}
-.btn.ghost:active{box-shadow:0 2px 0 #c9cfdc}
-.btn.small{font-size:clamp(18px,2.6vmin,26px)}
+.btn{font-family:var(--display);border:0;border-radius:14px;cursor:pointer;color:#fff;font-weight:500;
+  font-size:clamp(19px,2.8vmin,26px);padding:.55em 1.2em;display:inline-flex;align-items:center;gap:.45em;
+  background:var(--violet);box-shadow:0 3px 0 var(--violet2);transition:transform .08s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--violet2)}
+.btn.green{background:var(--good);box-shadow:0 3px 0 var(--good2)}
+.btn.green:active{box-shadow:0 1px 0 var(--good2)}
+.btn.pink{background:var(--pink);box-shadow:0 3px 0 var(--pink2)}
+.btn.pink:active{box-shadow:0 1px 0 var(--pink2)}
+.btn.honey{background:var(--honey);box-shadow:0 3px 0 var(--honey2);color:#3f2600}
+.btn.honey:active{box-shadow:0 1px 0 var(--honey2)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line),0 2px 0 var(--line)}
+.btn.ghost:active{box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.small{font-size:clamp(17px,2.3vmin,21px)}
 .btn[disabled]{opacity:.45;pointer-events:none}
-.btn.pulse{animation:btnpulse 1.4s ease-in-out infinite}
-@keyframes btnpulse{50%{transform:scale(1.07)}}
+.btn.pulse{animation:btnpulse 1.8s ease-in-out infinite}
+@keyframes btnpulse{50%{transform:scale(1.03)}}
 
-/* home */
-.title{font-weight:700;font-size:clamp(40px,7.5vmin,84px);color:#fff;margin:1vh 0 0;letter-spacing:.5px;
-  text-shadow:0 4px 0 var(--honey2),0 8px 18px rgba(0,0,0,.18);-webkit-text-stroke:2px var(--honey2)}
-.subtitle{font-size:clamp(18px,2.6vmin,28px);color:var(--ink);background:rgba(255,255,255,.85);padding:2px 16px;border-radius:999px;margin:.4vh 0 0;font-weight:500}
-.home-row{display:flex;align-items:center;gap:3vw;margin:auto 0}
+/* home: everything sits on one sheet so no theme's scenery can run behind it */
+.sheet{width:min(720px,100%);margin:auto 0;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:24px;box-shadow:var(--s3);
+  padding:clamp(12px,calc(var(--h,100vh)*.03),26px) clamp(16px,3vw,28px);display:flex;flex-direction:column;gap:clamp(8px,calc(var(--h,100vh)*.02),16px)}
+.brand{display:flex;align-items:center;gap:14px}
+.brand .bee{width:clamp(44px,calc(var(--h,100vh)*.09),72px);flex:none;animation:none}
+.title{font-family:var(--display);font-weight:600;font-size:clamp(26px,calc(var(--h,100vh)*.052),40px);line-height:1.05;margin:0;color:var(--ink);letter-spacing:-.2px}
+.subtitle{font-size:clamp(14px,calc(var(--h,100vh)*.023),17px);color:var(--soft);margin:1px 0 0}
 .bee{width:clamp(110px,18vmin,190px);animation:bob 2.4s ease-in-out infinite}
 .bee .wing{transform-origin:60px 40px;animation:flap .18s ease-in-out infinite alternate}
 @keyframes bob{50%{transform:translateY(-14px) rotate(-3deg)}}
 @keyframes flap{to{transform:scaleY(.6)}}
-.mode-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 12px;width:min(640px,74vw)}
-.mode-btns .btn{justify-content:center;font-size:clamp(16px,calc(var(--h,100vh)*.024),21px);text-align:left;padding:.5em .6em;gap:.3em;border-radius:20px}
-.mode-btns .btn .em{font-size:1.3em}
-.mode-btns #challengeBtn{grid-column:1/-1;font-size:clamp(28px,calc(var(--h,100vh)*.052),44px);padding:.45em .8em;border-radius:28px;animation:btnpulse 2.4s ease-in-out infinite}
-.mode-btns #challengeBtn small{font-size:.48em}
-.mode-btns .btn small{display:none;font-size:.5em;font-weight:500;opacity:.9}
-.mode-btns #challengeBtn small{display:block}
-
-.level-path{display:flex;align-items:center;justify-content:center}
-.lvl-node{border:0;background:#fff;border-radius:18px;padding:6px 8px;min-width:clamp(84px,14vw,130px);font:inherit;color:var(--ink);cursor:pointer;line-height:1.15;box-shadow:0 4px 0 #c9cfdc}
-.lvl-node .ic{display:block;font-size:clamp(24px,calc(var(--h,100vh)*.04),34px);line-height:1.1}
-.lvl-node b{display:block;font-size:clamp(15px,calc(var(--h,100vh)*.024),20px);font-weight:600}
-.lvl-node small{display:block;font-size:clamp(13px,calc(var(--h,100vh)*.02),16px);opacity:.75}
-.lvl-node.cur{background:var(--honey);color:#5a3500;box-shadow:0 4px 0 var(--honey2)}
-.lvl-node.done{background:#d9f7e8;box-shadow:0 4px 0 #9fdcbc}
-.lvl-node[disabled]{opacity:.6;cursor:default;box-shadow:0 2px 0 #c9cfdc}
-.lvl-link{flex:0 1 26px;min-width:8px;height:5px;background:#fff;opacity:.8}
-.bloom-line{text-align:center;font-weight:600;color:var(--meadow-ink);font-size:clamp(15px,calc(var(--h,100vh)*.024),20px);margin-top:6px}
-.meadow{margin-top:auto;width:min(1000px,100%);background:var(--meadow-bg);border-radius:28px;
-  padding:12px 16px 10px;backdrop-filter:blur(2px)}
-.empty-note{padding:18px;text-align:center;font-size:clamp(18px,2.4vmin,24px);color:var(--meadow-ink)}
+.mode-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,calc(var(--h,100vh)*.016),12px)}
+.mode-btns #challengeBtn{grid-column:1/-1;justify-content:flex-start;text-align:left;gap:14px;font-size:clamp(23px,calc(var(--h,100vh)*.042),32px);line-height:1.1;padding:clamp(8px,calc(var(--h,100vh)*.022),16px) 18px;border-radius:16px}
+.mode-btns #challengeBtn>span:nth-child(2){flex:1}
+.mode-btns #challengeBtn svg.i{width:1.3em;height:1.3em}
+#challengeBtn small{display:block;font-family:"Nunito",sans-serif;font-weight:700;font-size:clamp(13px,calc(var(--h,100vh)*.023),16px);opacity:.8;margin-top:2px}
+.mode{display:flex;align-items:center;justify-content:center;gap:9px;border:0;font-family:var(--display);font-weight:500;font-size:clamp(15px,calc(var(--h,100vh)*.027),20px);color:var(--ink);cursor:pointer;
+  background:#fff;border-radius:14px;padding:clamp(5px,calc(var(--h,100vh)*.012),10px) 8px;box-shadow:inset 0 0 0 1.5px var(--line),0 2px 0 var(--line);white-space:nowrap}
+.mode:active{transform:translateY(1px)}
+.mode[disabled]{opacity:.45;pointer-events:none}
+.mode .tint{width:1.65em;height:1.65em;border-radius:9px;display:grid;place-items:center;font-size:.92em}
+.tint.a{background:#fde8f1;color:#c23b7c}.tint.b{background:#eceafd;color:#5d50d6}.tint.c{background:#ddf5e9;color:#15804f}
+.path-head{display:flex;justify-content:space-between;align-items:baseline;font-size:clamp(13px,calc(var(--h,100vh)*.023),16px);color:var(--soft);font-weight:700}
+.path-head b{font-family:var(--display);font-weight:500;color:var(--ink);font-size:1.12em}
+.level-path{display:grid;grid-template-columns:repeat(5,1fr);position:relative;margin-top:clamp(4px,calc(var(--h,100vh)*.012),10px)}
+.level-path::before{content:"";position:absolute;left:10%;right:10%;top:calc(var(--ns)/2 - 1.5px);height:3px;background:var(--line);border-radius:3px}
+.level-path{--ns:clamp(32px,calc(var(--h,100vh)*.062),44px)}
+.lvl-node{position:relative;border:0;background:none;padding:0;font:inherit;color:var(--ink);cursor:pointer;line-height:1.15;display:flex;flex-direction:column;align-items:center}
+.lvl-node .ic{width:var(--ns);height:var(--ns);border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:inset 0 0 0 2px var(--line);font-family:var(--display);font-weight:500;font-size:calc(var(--ns)*.44);margin-bottom:3px}
+.lvl-node b{font-weight:800;font-size:clamp(13px,calc(var(--h,100vh)*.021),15px)}
+.lvl-node small{font-size:clamp(12px,calc(var(--h,100vh)*.019),14px);color:var(--soft);font-weight:700}
+.lvl-node.cur .ic{background:var(--honey);color:#3f2600;box-shadow:0 0 0 4px rgba(255,182,39,.28)}
+.lvl-node.done .ic{background:var(--good);color:#fff;box-shadow:none}
+.lvl-node[disabled]{cursor:default}
+.lvl-node[disabled] .ic{background:var(--track);color:#9a9eb2;box-shadow:none}
+.lvl-node[disabled] b,.lvl-node[disabled] small{color:#9a9eb2}
+.empty-note{padding:12px;text-align:center;font-size:17px;color:var(--soft)}
 
 /* learn + spell */
 .topline{display:flex;align-items:center;gap:14px;width:min(1000px,100%);margin-top:.5vh}
 .dots{display:flex;gap:8px;flex:1;justify-content:center;flex-wrap:wrap}
-.dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 2px rgba(43,45,66,.12)}
-.dot.cur{background:var(--honey);transform:scale(1.3)}
+.dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:var(--s1)}
+.dot.cur{background:var(--honey);box-shadow:0 0 0 3px rgba(255,255,255,.9)}
 .dot.s3{background:var(--good)} .dot.s2{background:#7fd6a8} .dot.s1{background:var(--hint)} .dot.seen{background:var(--violet)}
 
-.card{background:var(--card-t);border-radius:36px;box-shadow:0 0 0 5px var(--ring),0 12px 0 rgba(43,45,66,.12),0 20px 40px rgba(43,45,66,.12);
+.card{background:#fff;border-radius:24px;box-shadow:var(--s3);
   width:min(980px,100%);padding:3vh 3vw;margin-top:2vh;display:flex;flex-direction:column;align-items:center;gap:2vh;position:relative}
 .tiles{display:flex;gap:clamp(4px,1vw,12px);justify-content:center;flex-wrap:nowrap}
-.tile{--w:min(92px,calc(84vw / var(--n,6)));width:var(--w);height:calc(var(--w)*1.15);border-radius:18px;
-  display:grid;place-items:center;font-size:calc(var(--w)*.68);font-weight:600;line-height:1;
-  background:#fff;box-shadow:inset 0 -6px 0 rgba(43,45,66,.08),0 0 0 3px #e3e6ef;color:var(--ink);transition:background .2s,box-shadow .2s,color .2s}
+.tile{--w:min(92px,calc(84vw / var(--n,6)));width:var(--w);height:calc(var(--w)*1.15);border-radius:12px;
+  display:grid;place-items:center;font-family:var(--display);font-size:calc(var(--w)*.64);font-weight:500;line-height:1;
+  background:#fff;box-shadow:inset 0 0 0 2px var(--line);color:var(--ink);transition:background .2s,box-shadow .2s,color .2s}
 .tile.hid{color:transparent}
 .tile.in{animation:drop .45s cubic-bezier(.3,1.7,.5,1)}
 @keyframes drop{from{transform:translateY(-60px) scale(.5);opacity:0}}
-.tile.cursor{box-shadow:inset 0 -6px 0 rgba(43,45,66,.08),0 0 0 4px var(--honey)}
-.tile.ok{background:#d9f7e8;box-shadow:inset 0 -6px 0 rgba(23,138,87,.15),0 0 0 3px var(--good);color:var(--good2)}
-.tile.no{background:#ffe3e3;box-shadow:0 0 0 3px var(--bad);color:#c0392b;animation:shake .4s}
-.tile.show{background:#fff1d6;box-shadow:0 0 0 3px var(--hint);color:#b86200}
+.tile.cursor{box-shadow:inset 0 0 0 3px var(--honey)}
+.tile.ok{background:#e4f8ee;box-shadow:inset 0 0 0 2px var(--good);color:var(--good2)}
+.tile.no{background:#ffecec;box-shadow:inset 0 0 0 2px var(--bad);color:#c0392b;animation:shake .4s}
+.tile.show{background:#fff4df;box-shadow:inset 0 0 0 2px var(--hint);color:#b86200}
 .tile.ghost{color:rgba(43,45,66,.18)}
-.tile.lock{background:#d9f7e8;box-shadow:0 0 0 3px var(--good);color:var(--good2)}
+.tile.lock{background:#e4f8ee;box-shadow:inset 0 0 0 2px var(--good);color:var(--good2)}
 .tile.dance{animation:dance .6s ease}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @keyframes dance{30%{transform:translateY(-22px) rotate(-6deg)}60%{transform:translateY(0) rotate(4deg)}}
 .sentence{font-size:clamp(20px,3.2vmin,34px);text-align:center;color:var(--soft);min-height:1.3em;max-width:90%}
 .sentence b{color:var(--violet2)}
 .card-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
-.speak-big{width:clamp(90px,14vmin,130px);height:clamp(90px,14vmin,130px);border-radius:50%;border:0;cursor:pointer;
-  background:var(--honey);box-shadow:0 8px 0 var(--honey2);font-size:clamp(40px,7vmin,64px);display:grid;place-items:center}
-.speak-big:active{transform:translateY(6px);box-shadow:0 2px 0 var(--honey2)}
+.speak-big{width:clamp(84px,13vmin,116px);height:clamp(84px,13vmin,116px);border-radius:50%;border:0;cursor:pointer;color:#3f2600;
+  background:var(--honey);box-shadow:0 3px 0 var(--honey2);font-size:clamp(36px,6vmin,54px);display:grid;place-items:center}
+.speak-big:active{transform:translateY(2px);box-shadow:0 1px 0 var(--honey2)}
 .speak-big.talking{animation:btnpulse .7s ease-in-out infinite}
-.feedback{font-size:clamp(24px,4vmin,44px);font-weight:700;min-height:1.3em;text-align:center}
+.feedback{font-family:var(--display);font-size:clamp(24px,3.8vmin,40px);font-weight:600;min-height:1.3em;text-align:center}
 .feedback.good{color:var(--good2)} .feedback.try{color:var(--hint)} .feedback.tip{color:var(--violet2);font-size:clamp(20px,3vmin,32px)}
 .stars-earned{font-size:clamp(30px,5vmin,52px);min-height:1.2em;letter-spacing:4px}
 .stars-earned span{display:inline-block;animation:starpop .5s cubic-bezier(.3,1.8,.5,1) both}
@@ -172,7 +183,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 /* compact play card: must leave room for the keyboard on small iPads */
 .play-card{padding:clamp(8px,calc(var(--h,100vh)*.018),20px) 2vw;gap:clamp(4px,calc(var(--h,100vh)*.012),12px);margin-top:clamp(4px,calc(var(--h,100vh)*.012),14px);flex:none}
 .prompt-row{display:flex;align-items:center;justify-content:center;gap:16px;width:100%}
-.prompt-row .speak-big{width:clamp(56px,calc(var(--h,100vh)*.1),96px);height:clamp(56px,calc(var(--h,100vh)*.1),96px);font-size:clamp(28px,calc(var(--h,100vh)*.05),46px);flex:none;box-shadow:0 5px 0 var(--honey2)}
+.prompt-row .speak-big{width:clamp(56px,calc(var(--h,100vh)*.1),96px);height:clamp(56px,calc(var(--h,100vh)*.1),96px);font-size:clamp(26px,calc(var(--h,100vh)*.046),40px);flex:none;box-shadow:0 3px 0 var(--honey2)}
 .prompt-row .sentence{max-width:none;min-height:0;font-size:clamp(20px,calc(var(--h,100vh)*.035),32px);text-align:left}
 .play-card .tile{--w:min(92px,calc(84vw / var(--n,6)),calc(var(--h,100vh)*.115))}
 .fb-row{display:flex;align-items:center;justify-content:center;gap:12px;min-height:clamp(32px,calc(var(--h,100vh)*.065),52px);width:100%}
@@ -216,22 +227,20 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 @keyframes pfall{to{transform:translate3d(30px,118vh,0) rotate(120deg)}}
 @keyframes pfly{from{transform:translate3d(-12vw,0,0)}50%{transform:translate3d(55vw,-5vh,0)}to{transform:translate3d(118vw,3vh,0)}}
 @keyframes ptw{50%{opacity:.15;transform:scale(.6)}}
-.play-card::before,.play-card::after{content:var(--deco);position:absolute;top:8px;font-size:clamp(24px,calc(var(--h,100vh)*.05),42px);line-height:1}
-.play-card::before{left:14px}.play-card::after{right:14px}
 .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
-.theme-card{border:0;border-radius:22px;padding:clamp(10px,2vh,22px) 8px;font:inherit;font-weight:600;font-size:clamp(17px,2.6vmin,24px);color:#fff;cursor:pointer;
-  text-shadow:0 2px 3px rgba(0,0,0,.45);box-shadow:0 6px 0 rgba(43,45,66,.2)}
+.theme-card{border:0;border-radius:16px;padding:clamp(10px,2vh,22px) 8px;font:inherit;font-weight:600;font-size:clamp(17px,2.6vmin,24px);color:#fff;cursor:pointer;
+  text-shadow:0 1px 3px rgba(0,0,0,.45);box-shadow:var(--s2)}
 .theme-card .e{display:block;font-size:clamp(34px,calc(var(--h,100vh)*.08),64px);line-height:1.15}
-.theme-card.on{box-shadow:0 0 0 5px var(--honey),0 6px 0 rgba(43,45,66,.2)}
+.theme-card.on{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--honey)}
 .theme-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .theme-pills .list-pill[disabled]{opacity:.55;cursor:default}
 .theme-pills .list-pill{font-size:clamp(16px,2.4vmin,20px);padding:8px 14px}
-.round-tabs{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:1.2vh}
-.round-tab{border:0;border-radius:18px;padding:8px 20px;font:inherit;font-weight:600;font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);line-height:1.15;cursor:pointer;
-  background:rgba(255,255,255,.88);color:var(--ink);box-shadow:0 4px 0 rgba(43,45,66,.18)}
-.load-hint{margin-top:1vh;background:#fff}
-.round-tab small{display:block;font-weight:500;font-size:.72em;opacity:.8}
-.round-tab.on{background:var(--honey);color:#5a3500;box-shadow:0 0 0 3px #fff,0 4px 0 var(--honey2)}
+.round-tabs{display:flex;gap:4px;background:var(--track);border-radius:14px;padding:4px;width:100%}
+.round-tabs:empty{display:none}
+.round-tab{flex:1 1 0;min-width:0;border:0;border-radius:11px;padding:clamp(3px,calc(var(--h,100vh)*.009),7px) 8px;background:none;font-family:var(--display);font-weight:500;font-size:clamp(15px,calc(var(--h,100vh)*.026),19px);line-height:1.15;cursor:pointer;color:var(--soft)}
+.round-tab small{display:block;font-family:"Nunito",sans-serif;font-weight:700;font-size:.7em;opacity:.85}
+.round-tab.on{background:#fff;color:var(--ink);box-shadow:var(--s1)}
+.load-hint{background:#fff4df;color:#6d4300;width:100%;flex:none}
 /* cheering characters: they sit at the card's sides, so tiles get the width between them */
 .has-chars{--chw:clamp(78px,13vw,130px);--inner:calc(min(980px,100vw - 32px) - 2*var(--chw) - 24px);padding-left:var(--chw);padding-right:var(--chw)}
 .has-chars .tile{--w:min(92px,calc(var(--inner) / var(--n,6) - 12px),calc(var(--h,100vh)*.115))}
@@ -246,9 +255,9 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 @keyframes sad{0%,100%{transform:translateY(8px) rotate(-2deg)}50%{transform:translateY(10px) rotate(2deg)}}
 .player-chip{border:0;font-family:inherit;color:var(--ink);cursor:pointer;padding:6px 16px;max-width:30vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .who-list{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-height:calc(var(--h,100vh)*.3);overflow:auto;padding:6px}
-.who-pick{border:0;border-radius:20px;background:var(--honey);color:#5a3500;font:inherit;font-weight:600;font-size:clamp(22px,calc(var(--h,100vh)*.04),32px);padding:12px 26px;box-shadow:0 6px 0 var(--honey2);cursor:pointer}
+.who-pick{border:0;border-radius:14px;background:var(--honey);color:#3f2600;font-family:var(--display);font-weight:500;font-size:clamp(20px,calc(var(--h,100vh)*.034),28px);padding:10px 24px;box-shadow:0 3px 0 var(--honey2);cursor:pointer}
 .who-new{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
-.who-new input{font:inherit;font-size:clamp(20px,calc(var(--h,100vh)*.034),28px);padding:12px 18px;border-radius:18px;border:3px solid #e3e6ef;min-width:min(320px,70vw);-webkit-user-select:text;user-select:text}
+.who-new input{font:inherit;font-size:clamp(20px,calc(var(--h,100vh)*.034),28px);padding:11px 16px;border-radius:14px;border:2px solid var(--line);min-width:min(320px,70vw);-webkit-user-select:text;user-select:text}
 .report{width:100%;border-collapse:collapse;font-size:17px;margin:6px 0}
 .report th,.report td{padding:4px 10px;text-align:left;border-bottom:1px solid #e3e6ef}
 .report td.n,.report th.n{text-align:right;font-variant-numeric:tabular-nums}
@@ -256,11 +265,11 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 #report summary{font-weight:600;font-size:17px;cursor:pointer}
 .dot.no{background:var(--bad)}
 .fb-row{flex-wrap:wrap}
-.ch-act{font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);padding:.3em .9em;box-shadow:0 5px 0 #c9cfdc}
+.ch-act{font-size:clamp(17px,calc(var(--h,100vh)*.028),23px);padding:.3em .9em}
 .help-card{align-items:stretch;gap:8px;overflow:auto;max-height:calc(var(--h,100vh) - 90px);margin:auto 0;-webkit-user-select:text;user-select:text;font-size:clamp(17px,2.4vmin,20px);line-height:1.45;padding-left:3vw;padding-right:3vw}
 .help-card>*{flex-shrink:0}
-.help-card h2{margin:0;font-size:clamp(24px,3.5vmin,34px)}
-.help-card h3{margin:12px 0 0;font-size:clamp(20px,2.9vmin,25px);color:var(--violet2)}
+.help-card h2{font-family:var(--display);font-weight:600;margin:0;font-size:clamp(24px,3.5vmin,34px)}
+.help-card h3{font-family:var(--display);font-weight:500;margin:12px 0 0;font-size:clamp(19px,2.6vmin,23px);color:var(--violet2)}
 .help-card p,.help-card ol,.help-card ul{margin:2px 0}
 .help-card ol,.help-card ul{padding-left:24px}
 .help-card li{margin-bottom:4px}
@@ -270,13 +279,13 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .chip.score.good{color:var(--good2)}
 .chip.score.bump{animation:bump .5s}
 .toast{position:fixed;top:clamp(60px,calc(var(--h,100vh)*.1),90px);left:50%;z-index:45;pointer-events:none;background:var(--good);color:#fff;
-  font-weight:600;font-size:clamp(22px,calc(var(--h,100vh)*.04),34px);padding:10px 28px;border-radius:999px;box-shadow:0 6px 0 var(--good2),0 12px 24px rgba(0,0,0,.18);
+  font-family:var(--display);font-weight:500;font-size:clamp(20px,calc(var(--h,100vh)*.034),28px);padding:8px 24px;border-radius:14px;box-shadow:var(--s3);
   white-space:nowrap;transform:translateX(-50%);animation:toast 1.3s ease both}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,-24px) scale(.8)}15%{opacity:1;transform:translate(-50%,0) scale(1.06)}25%{transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-14px)}}
 .big-toast{position:fixed;top:0;right:0;bottom:0;left:0;z-index:48;display:flex;align-items:center;justify-content:center;background:rgba(43,45,66,.55);padding:16px}
-.big-toast-card{background:var(--card);border-radius:36px;padding:clamp(18px,4vh,40px) clamp(24px,5vw,60px);text-align:center;box-shadow:0 12px 0 rgba(43,45,66,.2);animation:drop .6s cubic-bezier(.3,1.5,.5,1);max-width:min(640px,100%)}
+.big-toast-card{background:#fff;border-radius:24px;padding:clamp(18px,4vh,40px) clamp(24px,5vw,60px);text-align:center;box-shadow:var(--s3);animation:drop .6s cubic-bezier(.3,1.5,.5,1);max-width:min(640px,100%)}
 .bt-icon{font-size:clamp(70px,calc(var(--h,100vh)*.16),130px);line-height:1.1}
-.bt-title{font-size:clamp(32px,calc(var(--h,100vh)*.07),58px);font-weight:700;color:var(--honey2);margin:6px 0}
+.bt-title{font-family:var(--display);font-size:clamp(30px,calc(var(--h,100vh)*.062),50px);font-weight:600;color:var(--ink);margin:6px 0}
 .bt-sub{font-size:clamp(20px,calc(var(--h,100vh)*.035),30px);color:var(--soft);margin-bottom:20px}
 #done .done-card{gap:clamp(6px,1.2vh,14px);padding:clamp(10px,2vh,24px) 2vw;max-height:calc(var(--h,100vh) - 84px);overflow:auto}
 #done .big-score{font-size:clamp(40px,calc(var(--h,100vh)*.08),80px)}
@@ -285,7 +294,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .pod{width:clamp(110px,16vw,160px);text-align:center}
 .pod .who{font-size:clamp(28px,calc(var(--h,100vh)*.05),42px);line-height:1}
 .pod .nm{font-size:clamp(15px,calc(var(--h,100vh)*.024),20px);font-weight:600;white-space:nowrap}
-.pod .blk{margin-top:4px;border-radius:12px 12px 0 0;color:#fff;font-weight:700;font-size:clamp(20px,calc(var(--h,100vh)*.035),30px);display:flex;flex-direction:column;justify-content:center;animation:rise .7s ease both}
+.pod .blk{margin-top:4px;border-radius:10px 10px 0 0;color:#fff;font-family:var(--display);font-weight:500;font-size:clamp(20px,calc(var(--h,100vh)*.035),30px);display:flex;flex-direction:column;justify-content:center;animation:rise .7s ease both}
 .pod.p1 .blk{height:clamp(70px,calc(var(--h,100vh)*.15),120px);background:#f5b700;animation-delay:.5s}
 .pod.p2 .blk{height:clamp(52px,calc(var(--h,100vh)*.11),90px);background:#9aa5b8;animation-delay:.25s}
 .pod.p3 .blk{height:clamp(40px,calc(var(--h,100vh)*.08),68px);background:#cd8a4b}
@@ -298,25 +307,25 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 /* keyboard */
 .kb{width:min(1000px,100%);margin-top:auto;display:flex;flex-direction:column;flex:none;gap:clamp(5px,1vh,12px);padding-top:6px;padding-bottom:6px}
 .kb-row{display:flex;justify-content:center;gap:clamp(4px,.8vw,10px)}
-.key{flex:0 0 auto;width:min(86px,calc((100vw - 120px) / 10.6));height:clamp(46px,calc(var(--h,100vh)*.1),84px);border:0;border-radius:16px;
-  background:#fff;color:var(--ink);font-family:inherit;font-weight:600;font-size:clamp(26px,4.4vmin,42px);
-  box-shadow:0 6px 0 #c9cfdc;cursor:pointer}
-.key:active,.key.hit{transform:translateY(4px);box-shadow:0 2px 0 #c9cfdc;background:#fff4d6}
+.key{flex:0 0 auto;width:min(86px,calc((100vw - 120px) / 10.6));height:clamp(46px,calc(var(--h,100vh)*.1),84px);border:0;border-radius:10px;
+  background:#fff;color:var(--ink);font-family:var(--display);font-weight:500;font-size:clamp(25px,4vmin,38px);
+  box-shadow:0 2px 0 rgba(34,36,58,.22);cursor:pointer}
+.key:active,.key.hit{transform:translateY(1px);box-shadow:0 1px 0 rgba(34,36,58,.22);background:#ffe9b8}
 .key.wide{width:min(150px,calc((100vw - 120px) / 6));font-size:clamp(22px,3.4vmin,32px)}
-.key.del{background:#ffe3e3;box-shadow:0 6px 0 #f3b5b5}
-.key.go{background:var(--good);color:#fff;box-shadow:0 6px 0 var(--good2)}
+.key.del{background:#f3f4f8}
+.key.go{background:var(--good);color:#fff;box-shadow:0 2px 0 var(--good2)}
 .key.go[disabled]{opacity:.4}
 
 /* done */
 .done-card{align-items:center;text-align:center}
-.big-score{font-size:clamp(56px,11vmin,120px);font-weight:700;color:var(--honey2);line-height:1}
+.big-score{font-family:var(--display);font-size:clamp(56px,11vmin,120px);font-weight:600;color:var(--ink);line-height:1}
 .result-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:900px}
-.res{background:#fff;border-radius:16px;padding:6px 12px;font-size:clamp(16px,2.4vmin,24px);box-shadow:0 3px 0 #e3e6ef}
+.res{background:#fff;border-radius:10px;padding:5px 11px;font-size:clamp(16px,2.2vmin,21px);box-shadow:inset 0 0 0 1.5px var(--line)}
 .res .st{color:var(--honey2)}
 
 /* setup */
 #setup .card{align-items:stretch;gap:14px;overflow:auto;max-height:calc(var(--h,100vh) - 120px)}
-#setup h2{margin:0;font-size:clamp(24px,3.5vmin,34px)}
+#setup h2{font-family:var(--display);font-weight:600;margin:0;font-size:clamp(23px,3.2vmin,30px)}
 #setup p{margin:0;color:var(--soft);font-size:17px;line-height:1.4}
 #setup textarea{width:100%;min-height:150px;border-radius:16px;border:2px solid #e3e6ef;padding:12px;font:16px/1.4 ui-monospace,Menlo,monospace;-webkit-user-select:text;user-select:text}
 #setup input[type=text]{border-radius:12px;border:2px solid #e3e6ef;padding:10px 12px;font:inherit;font-size:18px;-webkit-user-select:text;user-select:text}
@@ -329,13 +338,27 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 #confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50}
 .toast-bee{position:fixed;z-index:40;width:80px;pointer-events:none;transition:transform 1.1s cubic-bezier(.4,0,.2,1),opacity .4s}
 
-@media (orientation:portrait){
-  .home-row{flex-direction:column;gap:1vh}
-}
 @media (max-height:700px){ .card{padding:2vh 2vw;gap:1.2vh} }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5M5.5 9.8v9.7h13V9.8M10 19.5v-5h4v5"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4zM15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.3a2.8 2.8 0 1 1 4.1 2.6c-.9.5-1.4 1.1-1.4 2M12 17.2v.1"/></symbol>
+<symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 2-2 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.9-1.7H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z"/><path d="M7.5 12v.1M10 7.7v.1M15 7.7v.1"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1-4 4-6 7.5-6s6.5 2 7.5 6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12.5 2c.5 3.5-1 5-2.5 6.5C8.5 10 6 12 6 15.5 6 19 8.7 22 12 22s6-2.8 6-6.5c0-3-1.7-4.6-2.6-6.5-.5 1.2-1 2-2 2.5.5-3-.2-6.8-.9-9.5z"/></symbol>
+<symbol id="i-honey" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2.5l8.2 4.75v9.5L12 21.5l-8.2-4.75v-9.5z"/></symbol>
+<symbol id="i-ear" viewBox="0 0 24 24"><path d="M7 9a5.5 5.5 0 0 1 11 0c0 3-2.5 4-3.5 6-.7 1.5-1 5-4 5-1.8 0-3-1.3-3-3M10 9.5a2.5 2.5 0 0 1 5 0"/></symbol>
+<symbol id="i-blocks" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="m4 20 1-4.5L16.5 4a2.1 2.1 0 0 1 3 3L8 18.9zM14.5 6l3 3"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 3.5h8V10a4 4 0 0 1-8 0zM8 5.5H4.5c0 3 1.200 5 3.700 5.500M16 5.500h3.500c0 3-1.200 5-3.700 5.500M12 14v4.500M8 20.500h8"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><path d="m9 5.5 6.5 6.5L9 18.5"/></symbol>
+</defs></svg>
 <div id="scenery">
   <div class="sun"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
@@ -349,21 +372,21 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 
 <div id="app">
   <header>
-    <button class="iconbtn" id="homeBtn" aria-label="Home" style="display:none">🏠</button>
-    <div class="chip" id="honeyChip" title="Honey"><span class="ic">🍯</span><span id="honeyNum">0</span></div>
-    <div class="chip" id="streakChip" title="Days in a row"><span class="ic">🔥</span><span id="streakNum">0</span></div>
+    <button class="iconbtn" id="homeBtn" aria-label="Home" style="display:none"><svg class="i"><use href="#i-home"/></svg></button>
+    <div class="chip" id="honeyChip" title="Honey"><span class="ic"><svg class="i"><use href="#i-honey"/></svg></span><span id="honeyNum">0</span></div>
+    <div class="chip" id="streakChip" title="Days in a row"><span class="ic"><svg class="i"><use href="#i-flame"/></svg></span><span id="streakNum">0</span></div>
     <div class="spacer"></div>
-    <div class="chip player-chip" id="playerChip">👤 <span id="playerNameChip"></span></div>
-    <div class="chip" id="listChip"><span class="ic">📚</span><span id="listName">No words yet</span></div>
-    <button class="iconbtn" id="helpBtn" aria-label="How to play">❓</button>
-    <button class="iconbtn" id="themeBtn" aria-label="Pick a theme">🎨</button>
-    <button class="iconbtn" id="gearBtn" aria-label="Grown-ups corner">⚙️</button>
+    <div class="chip player-chip" id="playerChip"><svg class="i"><use href="#i-user"/></svg><span id="playerNameChip"></span></div>
+    <div class="chip" id="listChip"><span id="listName">No words yet</span></div>
+    <button class="iconbtn" id="helpBtn" aria-label="How to play"><svg class="i"><use href="#i-help"/></svg></button>
+    <button class="iconbtn" id="themeBtn" aria-label="Pick a theme"><svg class="i"><use href="#i-palette"/></svg></button>
+    <button class="iconbtn" id="gearBtn" aria-label="Grown-ups corner"><svg class="i"><use href="#i-gear"/></svg></button>
   </header>
 
   <!-- HELP -->
   <section class="screen" id="help">
     <div class="card help-card">
-      <div class="row" style="justify-content:space-between"><h2>❓ How to play</h2><button class="btn honey small" id="helpDone">Done ✓</button></div>
+      <div class="row" style="justify-content:space-between"><h2>How to play</h2><button class="btn honey small" id="helpDone">Done ✓</button></div>
 
       <h3>Getting started</h3>
       <ol>
@@ -426,34 +449,35 @@ cat, dog, sun</pre>
   <section class="screen" id="who">
     <div class="card done-card" style="margin:auto 0">
       <div id="whoBee"></div>
-      <div class="feedback good">Who’s playing today?</div>
+      <div class="feedback">Who’s playing today?</div>
       <div class="who-list" id="whoList"></div>
       <form class="who-new" id="whoForm">
         <input type="text" id="whoName" placeholder="Type your name" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false">
         <button class="btn green" type="submit">Let’s go! ➜</button>
       </form>
-      <button type="button" class="btn ghost small" id="whoHelp">❓ How to play (for adults to set up and guide kids)</button>
+      <button type="button" class="btn ghost small" id="whoHelp"><svg class="i"><use href="#i-help"/></svg>How to play (for adults to set up and guide kids)</button>
     </div>
   </section>
 
   <!-- HOME -->
   <section class="screen" id="home">
-    <h1 class="title">Spelling Garden</h1>
-    <p class="subtitle" id="hello">Grow a flower for every word you learn!</p>
-    <div class="round-tabs" id="roundTabs"></div>
-    <button class="round-tab load-hint" id="loadHint" hidden>📄 Load the word file to get 🐝 Medium Girl and 👑 Big Girl</button>
-    <div class="home-row">
-      <div id="homeBee"></div>
-      <div class="mode-btns">
-        <button class="btn honey" id="challengeBtn"><span class="em">🏆</span><span>Bee Challenge<small>5 levels, 20 words each, no hints</small></span></button>
-        <button class="btn pink" id="learnBtn"><span class="em">👂</span><span>Listen &amp; Learn<small>Hear it, see it, say it</small></span></button>
-        <button class="btn" id="buildBtn"><span class="em">🧩</span><span>Build It<small>Put the letter tiles in order</small></span></button>
-        <button class="btn green" id="spellBtn"><span class="em">✏️</span><span>Spell It!<small>Hear the word, spell it yourself</small></span></button>
+    <div class="sheet">
+      <div class="brand">
+        <div id="homeBee"></div>
+        <div><h1 class="title">Spelling Garden</h1><p class="subtitle" id="hello">Grow a flower for every word you learn!</p></div>
       </div>
-    </div>
-    <div class="meadow">
-      <div class="level-path" id="levelPath"></div>
-      <div class="bloom-line" id="bloomLine"></div>
+      <div class="round-tabs" id="roundTabs"></div>
+      <button class="round-tab load-hint" id="loadHint" hidden>Load the word file to get Medium Girl and Big Girl</button>
+      <div class="mode-btns">
+        <button class="btn honey" id="challengeBtn"><svg class="i"><use href="#i-trophy"/></svg><span>Bee Challenge<small>5 levels, 20 words each, no hints</small></span><svg class="i"><use href="#i-next"/></svg></button>
+        <button class="mode" id="learnBtn"><span class="tint a"><svg class="i"><use href="#i-ear"/></svg></span>Listen &amp; Learn</button>
+        <button class="mode" id="buildBtn"><span class="tint b"><svg class="i"><use href="#i-blocks"/></svg></span>Build It</button>
+        <button class="mode" id="spellBtn"><span class="tint c"><svg class="i"><use href="#i-pencil"/></svg></span>Spell It</button>
+      </div>
+      <div>
+        <div class="path-head"><b>Levels</b><span id="bloomLine"></span></div>
+        <div class="level-path" id="levelPath"></div>
+      </div>
     </div>
   </section>
 
@@ -461,11 +485,11 @@ cat, dog, sun</pre>
   <section class="screen" id="learn">
     <div class="topline"><div class="dots" id="learnDots"></div></div>
     <div class="card has-chars"><div class="char l"></div><div class="char r"></div>
-      <button class="speak-big" id="learnSpeak" aria-label="Hear it again">🔊</button>
+      <button class="speak-big" id="learnSpeak" aria-label="Hear it again"><svg class="i"><use href="#i-sound"/></svg></button>
       <div class="tiles" id="learnTiles"></div>
       <div class="sentence" id="learnSentence"></div>
       <div class="card-actions">
-        <button class="btn ghost small" id="learnAgain">🔁 Again</button>
+        <button class="btn ghost small" id="learnAgain">Again</button>
         <button class="btn green small" id="learnNext" disabled>Next ➜</button>
       </div>
     </div>
@@ -474,7 +498,7 @@ cat, dog, sun</pre>
   <!-- THEMES -->
   <section class="screen" id="themes">
     <div class="card done-card" style="margin:auto 0">
-      <div class="feedback good">🎨 Pick your round!</div>
+      <div class="feedback">Pick your round</div>
       <div class="theme-grid" id="themeGrid"></div>
       <button class="btn green" id="themesDone">Let’s go! ➜</button>
     </div>
@@ -484,7 +508,7 @@ cat, dog, sun</pre>
   <section class="screen" id="build">
     <div class="topline"><div class="dots" id="buildDots"></div></div>
     <div class="card play-card has-chars"><div class="char l"></div><div class="char r"></div>
-      <div class="prompt-row"><button class="speak-big" id="buildSpeak" aria-label="Hear the word">🔊</button><div class="sentence" id="buildSentence"></div></div>
+      <div class="prompt-row"><button class="speak-big" id="buildSpeak" aria-label="Hear the word"><svg class="i"><use href="#i-sound"/></svg></button><div class="sentence" id="buildSentence"></div></div>
       <div class="tiles" id="buildSlots"></div>
       <div class="fb-row"><div class="feedback" id="buildFeedback"></div><div class="stars-earned" id="buildStars"></div></div>
     </div>
@@ -499,24 +523,24 @@ cat, dog, sun</pre>
   <section class="screen" id="chIntro">
     <div class="card done-card">
       <div class="trophy" id="chIcon">🏆</div>
-      <div class="feedback good" id="chTitle">Bee Challenge</div>
+      <div class="feedback" id="chTitle">Bee Challenge</div>
       <div class="round-tabs" id="chRounds"></div>
-      <div class="sentence">You’ll hear <b id="chCount">20</b> <span id="chWords">words</span>, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.<br>Stuck? Skip it and try it at the end.</div>
+      <div class="sentence">You’ll hear <b id="chCount">20</b> <span id="chWords">words</span>, just like the real Spelling Bee.<br>No hints this time! Tap the speaker to hear a word again.<br>Stuck? Skip it and try it at the end.</div>
       <div class="theme-pills" id="chThemes"></div>
       <div class="best" id="chBest"></div>
-      <button class="toggle" id="timerToggle" aria-pressed="false"><span class="knob"></span><span id="timerLabel">⏱️ Timer: Off</span></button>
+      <button class="toggle" id="timerToggle" aria-pressed="false"><span class="knob"></span><span id="timerLabel">Timer: Off</span></button>
       <div class="card-actions">
-        <button class="btn honey" id="chStart">🐝 Start!</button>
-        <button class="btn ghost" id="chBack">🏠 Garden</button>
+        <button class="btn honey" id="chStart">Start</button>
+        <button class="btn ghost" id="chBack"><svg class="i"><use href="#i-home"/></svg>Home</button>
       </div>
     </div>
   </section>
 
   <!-- SPELL (also used by Bee Challenge) -->
   <section class="screen" id="spell">
-    <div class="topline"><div class="dots" id="spellDots"></div><div class="chip score" id="scoreDone" hidden>📝 <span id="scoreDoneNum">0/20</span></div><div class="chip score good" id="scoreRight" hidden>✅ <span id="scoreRightNum">0</span></div><div class="chip clock" id="clock" hidden>⏱️ <span id="clockNum">0:00</span></div></div>
+    <div class="topline"><div class="dots" id="spellDots"></div><div class="chip score" id="scoreDone" hidden><span id="scoreDoneNum">0/20</span></div><div class="chip score good" id="scoreRight" hidden><svg class="i"><use href="#i-check"/></svg><span id="scoreRightNum">0</span></div><div class="chip clock" id="clock" hidden><span id="clockNum">0:00</span></div></div>
     <div class="card play-card has-chars"><div class="char l"></div><div class="char r"></div>
-      <div class="prompt-row"><button class="speak-big" id="spellSpeak" aria-label="Hear the word">🔊</button><div class="sentence" id="spellSentence"></div></div>
+      <div class="prompt-row"><button class="speak-big" id="spellSpeak" aria-label="Hear the word"><svg class="i"><use href="#i-sound"/></svg></button><div class="sentence" id="spellSentence"></div></div>
       <div class="tiles" id="spellTiles"></div>
       <div class="fb-row"><div class="feedback" id="spellFeedback"></div><div class="stars-earned" id="spellStars"></div><button class="btn ghost ch-act" id="chAct" hidden></button></div>
     </div>
@@ -535,7 +559,7 @@ cat, dog, sun</pre>
       <div class="card-actions">
         <button class="btn pink" id="doneExtra" hidden></button>
         <button class="btn green" id="doneNext">Play again</button>
-        <button class="btn ghost" id="doneHome">🏠 Garden</button>
+        <button class="btn ghost" id="doneHome"><svg class="i"><use href="#i-home"/></svg>Home</button>
       </div>
     </div>
   </section>
@@ -543,16 +567,16 @@ cat, dog, sun</pre>
   <!-- SETUP (grown-ups) -->
   <section class="screen" id="setup">
     <div class="card">
-      <div class="row" style="justify-content:space-between"><h2>⚙️ Grown-ups corner</h2><button class="btn honey small" id="setupDone">Done ✓</button></div>
-      <h2 style="font-size:22px">📊 Report card</h2>
+      <div class="row" style="justify-content:space-between"><h2>Grown-ups corner</h2><button class="btn honey small" id="setupDone">Done ✓</button></div>
+      <h2 style="font-size:22px">Report card</h2>
       <div class="list-pick" id="reportWho"></div>
       <div id="report"></div>
       <div class="row">
         <button class="btn ghost small" id="startOver"></button>
         <button class="btn ghost small" id="removePlayer"></button>
-        <button class="btn ghost small" id="changePlayer">🔄 Change player</button>
+        <button class="btn ghost small" id="changePlayer">Change player</button>
       </div>
-      <h2 style="font-size:22px">🏆 Podium players</h2>
+      <h2 style="font-size:22px">Podium players</h2>
       <p>Rename the four pretend players, like family or friends. Names stay on this device. Leave a box empty to use the standard name.</p>
       <div class="row" id="botRows"></div>
       <h2 style="font-size:22px">Word lists</h2>
@@ -561,8 +585,8 @@ cat, dog, sun</pre>
         Commas work too: <code>cat, dog, sun</code>.</p>
       <textarea id="importText" placeholder="# My Words&#10;kite | My kite flew up high.&#10;green | The frog is green."></textarea>
       <div class="row">
-        <button class="btn green small" id="importBtn">➕ Add these words</button>
-        <label class="btn ghost small" style="position:relative">📄 Load a file
+        <button class="btn green small" id="importBtn">Add these words</button>
+        <label class="btn ghost small" style="position:relative">Load a file
           <input type="file" id="importFile" title=" " accept=".txt,text/plain" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer"></label>
       </div>
       <div class="msg" id="importMsg"></div>
@@ -570,7 +594,7 @@ cat, dog, sun</pre>
       <div class="list-pick" id="listPick"></div>
       <div id="progressBox"></div>
       <div class="row">
-        <button class="btn ghost small" id="deleteList">🗑️ Remove this list</button>
+        <button class="btn ghost small" id="deleteList">Remove this list</button>
       </div>
     </div>
   </section>
@@ -581,6 +605,7 @@ cat, dog, sun</pre>
 'use strict';
 const $ = s => document.querySelector(s);
 const wait = ms => new Promise(r => setTimeout(r, ms));
+const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
@@ -611,9 +636,9 @@ if (players == null) {                       // first run after this update: kee
   store.set('players', players);
 }
 // the two Bee lists show as levels; ids stay the same so progress already on a device is kept
-const LEVELS = { '1st-grade-bee': { name: 'Medium Girl', icon: '🐝' }, '2nd-grade-bee': { name: 'Big Girl', icon: '👑' } };
+const LEVELS = { '1st-grade-bee': { name: 'Medium Girl' }, '2nd-grade-bee': { name: 'Big Girl' } };
 function nameLevels() { lists.forEach(l => { if (LEVELS[l.id]) l.name = LEVELS[l.id].name; }); }
-const roundLabel = (l, k) => (LEVELS[l.id] ? `${LEVELS[l.id].icon} ${l.name}` : `Round ${k + 1}: ${esc(l.name)}`);
+const roundLabel = (l, k) => (LEVELS[l.id] ? l.name : `Round ${k + 1}: ${esc(l.name)}`);
 nameLevels();
 const activeList = () => lists.find(l => l.id === activeId) || lists[0] || null;
 const prog = id => (progress[id] = progress[id] || {});
@@ -848,6 +873,7 @@ function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   $('#homeBtn').style.display = id === 'home' ? 'none' : '';
   $('#themeBtn').style.display = $('#helpBtn').style.display = $('#playerChip').style.display = id === 'home' ? '' : 'none';
+  $('#listChip').style.display = id === 'home' ? 'none' : '';
   document.querySelector('header').style.visibility = id === 'who' || (id === 'help' && !player) ? 'hidden' : '';
 }
 function bumpHoney(add) {
@@ -865,13 +891,13 @@ function dayKey(off) { const d = new Date(); d.setDate(d.getDate() + off); retur
 
 function renderPath(L) {
   const box = $('#levelPath'), line = $('#bloomLine');
-  if (!L) { box.innerHTML = '<div class="empty-note">🌱 No words yet! Ask a grown-up to tap ⚙️ to add words.</div>'; line.textContent = ''; return; }
+  if (!L) { box.innerHTML = '<div class="empty-note" style="grid-column:1/-1">No words yet. Ask a grown-up to tap the gear to add words.</div>'; line.textContent = ''; return; }
   box.innerHTML = levelMode() ? RL.map((k, i) => {
-    const n = i + 1, open = unlocked(n), b = bests['L' + n], link = i ? '<div class="lvl-link"></div>' : '';
-    return `${link}<button class="lvl-node ${passed(n) ? 'done' : ''} ${open && n === nextLevel() ? 'cur' : ''}" data-l="${n}" ${open ? '' : 'disabled'}><span class="ic">${passed(n) ? '⭐' : open ? THEMES[k].icon : '🔒'}</span><b>Level ${n}</b><small>${b ? `${b.score}/${b.n}` : open ? 'Play' : 'Locked'}</small></button>`;
+    const n = i + 1, open = unlocked(n), b = bests['L' + n];
+    return `<button class="lvl-node ${passed(n) ? 'done' : ''} ${open && n === nextLevel() ? 'cur' : ''}" data-l="${n}" ${open ? '' : 'disabled'}><span class="ic">${passed(n) ? ic('check') : open ? n : ic('lock')}</span><b>Level ${n}</b><small>${b ? `${b.score}/${b.n}` : open ? 'Play' : 'Locked'}</small></button>`;
   }).join('') : '';
   const P = prog(L.id), blooms = L.words.filter(({ w }) => stageOf(P[w]) === 3).length;
-  line.textContent = `${T().bloom || '🌸'} ${blooms} / ${L.words.length} words in bloom`;
+  line.textContent = `${T().bloom || '🌸'} ${blooms} of ${L.words.length} words in bloom`;
 }
 // the level to work on: the first one not passed yet
 function nextLevel() { for (let n = 1; n <= 5; n++) if (!passed(n)) return n; return 5; }
@@ -882,7 +908,7 @@ function renderHome() {
   $('#loadHint').hidden = lists.some(l => LEVELS[l.id]);
   $('#roundTabs').innerHTML = lists.length > 1 ? lists.map((l, k) => {
     const P = prog(l.id), blooms = l.words.filter(({ w }) => stageOf(P[w]) === 3).length;
-    return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}<small>${T().icon} ${blooms} / ${l.words.length}</small></button>`;
+    return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}<small>${blooms} of ${l.words.length}</small></button>`;
   }).join('') : '';
   $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
   renderPath(L);
@@ -965,7 +991,7 @@ function spellShow() {
   $('#spellSentence').innerHTML = w.s ? blank(w.s, w.w) : '&nbsp;';
   renderSlots(); renderGo();
   S.await = false; const act = $('#chAct'); act.hidden = S.mode !== 'challenge';
-  if (S.mode === 'challenge') { act.textContent = S.phase === 1 ? '⏭️ Skip for now' : '🤷 Show me'; act.classList.remove('pulse'); renderScore(); }
+  if (S.mode === 'challenge') { act.textContent = S.phase === 1 ? 'Skip for now' : 'Show me'; act.classList.remove('pulse'); renderScore(); }
   promptWord();
 }
 async function promptWord() {
@@ -1260,7 +1286,7 @@ function renderChIntro() {
     : Object.entries(THEMES).map(([k, t]) => `<button class="list-pill ${k === theme ? 'on' : ''}" data-t="${k}">${t.icon} ${t.name}</button>`).join('');
   const n = Math.min(20, L.words.length); $('#chCount').textContent = n; $('#chWords').textContent = n === 1 ? 'word' : 'words';
   $('#chRounds').innerHTML = !lv && lists.length > 1 ? lists.map((l, k) => `<button class="round-tab ${l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}</button>`).join('') : '';
-  $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `⏱️ Timer: ${timerOn ? 'On' : 'Off'}`;
+  $('#timerToggle').setAttribute('aria-pressed', timerOn); $('#timerLabel').textContent = `Timer: ${timerOn ? 'On' : 'Off'}`;
   const best = bests[lv ? 'L' + chLevel : L.id], need = Math.ceil(n * PASS);
   $('#chBest').textContent = best ? `🏅 Best: ${best.score} / ${best.n}` + (best.ms ? ` in ${fmt(best.ms)}` : '') + (lv && chLevel < 5 && !unlocked(chLevel + 1) ? ` · Get ${need} to unlock Level ${chLevel + 1}` : '') : (lv && chLevel < 5 ? `Get ${need} of ${n} to unlock Level ${chLevel + 1}` : '');
 }
