@@ -247,6 +247,9 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .report td.n,.report th.n{text-align:right;font-variant-numeric:tabular-nums}
 #report details{background:#f6f3fb;border-radius:12px;padding:8px 12px;margin-bottom:8px}
 #report summary{font-weight:600;font-size:17px;cursor:pointer}
+.dot.no{background:var(--bad)}
+.fb-row{flex-wrap:wrap}
+.ch-act{font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);padding:.3em .9em;box-shadow:0 5px 0 #c9cfdc}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -420,7 +423,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
       <div class="trophy" id="chIcon">🏆</div>
       <div class="feedback good" id="chTitle">Bee Challenge</div>
       <div class="round-tabs" id="chRounds"></div>
-      <div class="sentence">You’ll hear <b id="chCount">20</b> <span id="chWords">words</span>, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.</div>
+      <div class="sentence">You’ll hear <b id="chCount">20</b> <span id="chWords">words</span>, just like the real Spelling Bee.<br>No hints this time! Tap 🔊 to hear a word again.<br>Stuck? Skip it and try it at the end.</div>
       <div class="theme-pills" id="chThemes"></div>
       <div class="best" id="chBest"></div>
       <button class="toggle" id="timerToggle" aria-pressed="false"><span class="knob"></span><span id="timerLabel">⏱️ Timer: Off</span></button>
@@ -437,7 +440,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="card play-card has-chars"><div class="char l"></div><div class="char r"></div>
       <div class="prompt-row"><button class="speak-big" id="spellSpeak" aria-label="Hear the word">🔊</button><div class="sentence" id="spellSentence"></div></div>
       <div class="tiles" id="spellTiles"></div>
-      <div class="fb-row"><div class="feedback" id="spellFeedback"></div><div class="stars-earned" id="spellStars"></div></div>
+      <div class="fb-row"><div class="feedback" id="spellFeedback"></div><div class="stars-earned" id="spellStars"></div><button class="btn ghost ch-act" id="chAct" hidden></button></div>
     </div>
     <div class="kb" id="kb"></div>
   </section>
@@ -900,6 +903,8 @@ function spellShow() {
   $('#spellStars').innerHTML = ''; setMood('idle');
   $('#spellSentence').innerHTML = w.s ? blank(w.s, w.w) : '&nbsp;';
   renderSlots(); renderGo();
+  S.await = false; const act = $('#chAct'); act.hidden = S.mode !== 'challenge';
+  if (S.mode === 'challenge') { act.textContent = S.phase === 1 ? '⏭️ Skip for now' : '🤷 Show me'; act.classList.remove('pulse'); renderScore(); }
   promptWord();
 }
 async function promptWord() {
@@ -1204,18 +1209,17 @@ function openChallenge() {
 function startChallenge() {
   const L = activeList(); if (!L) return;
   const lv = levelMode();
-  S = { mode: 'challenge', list: L, level: lv ? chLevel : 0, words: shuffle(lv ? levelSets()[chLevel - 1] : L.words).slice(0, 20), i: 0, marks: [], results: [] };
+  S = { mode: 'challenge', phase: 1, queue: [], seen: 0, list: L, level: lv ? chLevel : 0, words: shuffle(lv ? levelSets()[chLevel - 1] : L.words).slice(0, 20), i: 0, marks: [], results: [] };
   show('spell'); $('#clock').hidden = !timerOn; if (timerOn) startClock();
   $('#scoreDone').hidden = $('#scoreRight').hidden = false; renderScore();
   spellShow();
 }
 const CH_RIGHT = ['Correct!', 'You got it!', 'Yes!', 'Super!', 'Well done!', 'Great spelling!'];
-const CH_NEXT = ['Nice try! Next word.', 'Keep going!', 'Here comes the next one!', 'On to the next one!'];
 function renderScore() {
-  const right = S.results.filter(r => r.right).length;
-  $('#scoreDoneNum').textContent = `${S.results.length}/${S.words.length}`;
-  $('#scoreRightNum').textContent = `${right} correct`;
+  $('#scoreDoneNum').textContent = S.phase === 1 ? `${S.seen}/${S.words.length}` : `🔁 ${S.queue.length + 1} left`;
+  $('#scoreRightNum').textContent = `${S.results.filter(r => r.right).length} correct`;
 }
+/* first pass: a miss or skip just queues the word. A point only drops if it's still wrong in the end round. */
 async function challengeCheck() {
   S.busy = true; renderGo();
   const id = newRun(), w = S.words[S.i], guess = S.typed.join(''), right = guess === w.w;
@@ -1223,21 +1227,59 @@ async function challengeCheck() {
   tally(w.w, right);
   if (right) { r.b = Math.min(5, r.b + 1); r.ok++; } else { r.b = Math.max(0, r.b - 1); r.miss++; }
   r.last = Date.now(); save();
-  S.results.push({ w: w.w, guess, right }); S.marks[S.i] = right ? 's3' : 'seen';
+  if (S.phase === 1) S.seen++;
+  if (!right) return challengeExplain(id, guess);
+  S.results.push({ w: w.w, guess, right: true }); S.marks[S.i] = 's3';
   renderScore(); dots($('#spellDots'), S.words.length, S.i, S.marks);
-  let msg;
-  if (right) {
-    msg = pick(CH_RIGHT); toast(`✅ ${msg}`); sfx.good(); setMood('happy');
-    const c = $('#scoreRight'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
-  } else {
-    // wrong answers stay quiet; the misses are shown at the end
-    msg = pick(CH_NEXT); sfx.tap(); setMood('sad');
-    const fb = $('#spellFeedback'); fb.className = 'feedback tip'; fb.textContent = msg;
-  }
+  const ok = {}; S.w.split('').forEach((_, k) => ok[k] = 'ok dance'); S.locked = S.locked.map(() => true); renderSlots(ok);
+  $('#chAct').hidden = true;
+  const msg = S.phase === 1 ? pick(CH_RIGHT) : 'You got it this time!';
+  toast(`✅ ${msg}`); sfx.good(); setMood('happy');
+  const c = $('#scoreRight'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
   await sayIf(id, msg, { rate: 1 });
-  await wait(right ? 500 : 250); if (id !== runId) return;
-  if (S.i < S.words.length - 1) { S.i++; spellShow(); } else endChallenge();
+  await wait(500); if (id !== runId) return;
+  challengeNext();
 }
+async function challengeExplain(id, guess) {
+  const w = S.words[S.i], fb = $('#spellFeedback'), act = $('#chAct'), first = S.phase === 1;
+  if (first) { S.queue.push(S.i); S.marks[S.i] = 's1'; }
+  else { S.results.push({ w: w.w, guess, right: false }); S.marks[S.i] = 'no'; }
+  renderScore(); dots($('#spellDots'), S.words.length, S.i, S.marks);
+  S.busy = true; act.hidden = true; sfx.soft(); setMood('sad');
+  S.typed = S.w.split(''); S.locked = S.locked.map(() => true);
+  const sh = {}; S.w.split('').forEach((_, k) => sh[k] = 'show'); renderSlots(sh);
+  fb.className = 'feedback try'; fb.textContent = 'No worries! Here’s how to spell it.';
+  if (!await sayIf(id, `No worries! ${w.w} is spelled`, { rate: 0.9 })) return;
+  if (!await spellOut(id, w.w, k => { const t = $('#spellTiles').children[k]; t && (t.classList.remove('dance'), void t.offsetWidth, t.classList.add('dance')); })) return;
+  if (!await sayIf(id, w.w, { rate: 0.8 })) return;
+  const tip = tipFor(w.w);
+  if (tip) { fb.className = 'feedback tip'; fb.textContent = tip.show; if (!await sayIf(id, tip.say)) return; }
+  fb.className = 'feedback tip'; fb.textContent = first ? 'We’ll try it again at the end!' : 'You’ll get it next time!';
+  if (!await sayIf(id, first ? "We'll try it again at the end." : "You'll get it next time.")) return;
+  S.await = true; act.textContent = 'Got it ➜'; act.hidden = false; act.classList.add('pulse');
+}
+function challengeNext() {
+  if (S.phase === 1 && S.i < S.words.length - 1) { S.i++; spellShow(); return; }
+  if (S.phase === 1) { S.phase = 2; if (S.queue.length) return challengeRetryIntro(); return endChallenge(); }
+  if (S.queue.length) { S.i = S.queue.shift(); spellShow(); } else endChallenge();
+}
+async function challengeRetryIntro() {
+  const id = newRun(), n = S.queue.length, fb = $('#spellFeedback');
+  S.busy = true; $('#chAct').hidden = true; setMood('happy'); S.typed = S.typed.map(() => ''); S.locked = S.locked.map(() => false); renderSlots();
+  fb.className = 'feedback good'; fb.textContent = n === 1 ? 'One more try!' : `Let’s try these ${n} again!`;
+  toast(`🔁 ${fb.textContent}`); sfx.bloom();
+  await sayIf(id, n === 1 ? "Let's try that word again. You can do it!" : `Let's try those ${n} words again. You can do it!`, { rate: 0.95, pitch: 1.12 });
+  await wait(300); if (id !== runId) return;
+  S.i = S.queue.shift(); spellShow();
+}
+$('#chAct').onclick = () => {
+  if (!S || S.mode !== 'challenge') return;
+  actx(); sfx.tap();
+  if (S.await) { S.await = false; challengeNext(); return; }
+  if (S.busy) return;
+  if (S.phase === 1) { S.queue.push(S.i); S.marks[S.i] = 's1'; S.seen++; newRun(); challengeNext(); return; }
+  S.busy = true; tally(S.w, false); save(); challengeExplain(newRun(), '');                                  // end round: stuck counts as a drop
+};
 /* the bots stay close to her last best, so the race is close and they improve as she does */
 const BOTS = [['Chithi bonu', '🦋'], ['Chhuti didi', '🐞'], ['Bhai', '🐸'], ['Dibhai', '🦊']];
 function botScores(n, prev) {
@@ -1283,7 +1325,7 @@ function endChallenge() {
   $('#doneScore').textContent = `${score} / ${n}`;
   const lvlNote = opened ? `🔓 Level ${next} is unlocked!` : next && !nowOpen ? `Get ${Math.ceil(n * PASS)} to unlock Level ${next}.` : '';
   $('#doneSub').textContent = (lvlNote ? lvlNote + ' ' : '') + (record && prev ? 'New record! ' : '') + (ms ? `Time: ${fmt(ms)}. ` : '') + `+${earned} honey 🍯` + (misses.length ? ' · Words to practice:' : '');
-  $('#doneList').innerHTML = misses.map(r => `<div class="res miss">${r.guess} → <span class="fix">${r.w}</span></div>`).join('');
+  $('#doneList').innerHTML = misses.map(r => `<div class="res miss">${r.guess || 'skipped'} → <span class="fix">${r.w}</span></div>`).join('');
   renderPodium(table);
   if (misses.length) { const missed = misses.map(m => S.words.find(x => x.w === m.w)); doneExtra('✏️ Practice my misses', () => startSpell(missed)); }
   else doneExtra(null);
