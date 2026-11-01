@@ -397,7 +397,7 @@ cat, dog, sun</pre>
         <li><b>⏭️ Skip for now:</b> saves a hard word for the end.</li>
         <li><b>End round:</b> each missed or skipped word gets one more try. A point is lost only if it’s still wrong then.</li>
         <li><b>Levels:</b> 5 levels of 20 fixed words, from easier to harder. Score 16 out of 20 (80%) to unlock the next one.</li>
-        <li><b>Podium:</b> your child races four pretend players whose scores stay close to their best.</li>
+        <li><b>Podium:</b> your child races four pretend players whose scores stay close to their best. You can rename them in ⚙️.</li>
         <li><b>Timer:</b> optional. It counts up and never ends the game.</li>
       </ul>
 
@@ -548,6 +548,9 @@ cat, dog, sun</pre>
         <button class="btn ghost small" id="removePlayer"></button>
         <button class="btn ghost small" id="changePlayer">🔄 Change player</button>
       </div>
+      <h2 style="font-size:22px">🏆 Podium players</h2>
+      <p>Rename the four pretend players, like family or friends. Names stay on this device. Leave a box empty to use the standard name.</p>
+      <div class="row" id="botRows"></div>
       <h2 style="font-size:22px">Word lists</h2>
       <p>Words stay on this device only. One word per line, with an optional sentence after a bar:
         <code>kite | My kite flew up high.</code> Tag each list with a line above its words: <code># Medium Girl</code>, <code># Big Girl</code>, or a new name like <code># Week 12</code>. One file can hold them all.
@@ -1358,14 +1361,15 @@ $('#chAct').onclick = () => {
   S.busy = true; tally(S.w, 'w'); save(); challengeExplain(newRun(), '');                                  // end round: stuck counts as a drop
 };
 /* the bots stay close to her last best, so the race is close and they improve as she does */
-const BOTS = [['Chithi bonu', '🦋'], ['Chhuti didi', '🐞'], ['Bhai', '🐸'], ['Dibhai', '🦊']];
+const BOTS = [['Buzzy', '🦋'], ['Dot', '🐞'], ['Hopper', '🐸'], ['Rusty', '🦊']];
+let botNames = store.get('botNames', []);      // grown-ups' own names, stored on this device only
 function botScores(n, prev) {
   const base = prev ? prev.score / prev.n : 0.7;
   const offs = shuffle([-0.2, -0.08, 0.02, 0.12]);
   return BOTS.map(([name, icon], k) => {
     const p = Math.max(0.35, Math.min(0.97, base + offs[k])); let score = 0;
     for (let i = 0; i < n; i++) if (Math.random() < p) score++;
-    return { name, icon, score };
+    return { name: botNames[k] || name, icon, score };
   });
 }
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1476,6 +1480,7 @@ function doImport(text) {
   if (!skipped.length) { goHome(); sfx.bloom(); toast(`✅ Added ${got.map(l => (LEVELS[l.id] || l).name).join(' and ')}`); }
 }
 function renderSetup() {
+  $('#botRows').innerHTML = BOTS.map(([n, ic], k) => `<input type="text" data-k="${k}" maxlength="16" autocomplete="off" aria-label="Podium player ${k + 1}" placeholder="${ic} ${n}" value="${esc(botNames[k] || '')}">`).join('');
   $('#listPick').innerHTML = lists.length ? lists.map(l => `<button class="list-pill ${l.id === (activeList() || {}).id ? 'on' : ''}" data-id="${l.id}">${l.name} · ${l.words.length}</button>`).join('') : '<p>No lists yet.</p>';
   const L = activeList();
   if (L) {
@@ -1558,6 +1563,7 @@ $('#importBtn').onclick = () => doImport($('#importText').value);
 $('#importFile').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(doImport); e.target.value = ''; };
 $('#listPick').onclick = e => { const b = e.target.closest('.list-pill'); if (!b) return; activeId = b.dataset.id; save(); renderSetup(); };
 $('#deleteList').onclick = () => { const L = activeList(); if (!L || !confirm(`Remove “${L.name}”? Its progress is deleted too.`)) return; lists = lists.filter(l => l.id !== L.id); delete progress[L.id]; activeId = lists[0] ? lists[0].id : null; save(); renderSetup(); };
+$('#botRows').oninput = e => { const k = +e.target.dataset.k; botNames[k] = e.target.value.trim(); store.set('botNames', botNames); };
 $('#setupDone').onclick = goHome;
 
 addEventListener('resize', () => { if ($('#home').classList.contains('on')) renderHome(); });
