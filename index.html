@@ -114,7 +114,7 @@ svg.i{width:1.15em;height:1.15em;flex:none;display:block;fill:none;stroke:curren
 @keyframes bob{50%{transform:translateY(-14px) rotate(-3deg)}}
 @keyframes flap{to{transform:scaleY(.6)}}
 .mode-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,calc(var(--h,100vh)*.016),12px)}
-.mode-btns #challengeBtn{grid-column:1/-1;justify-content:flex-start;text-align:left;gap:14px;font-size:clamp(23px,calc(var(--h,100vh)*.042),32px);line-height:1.1;padding:clamp(8px,calc(var(--h,100vh)*.022),16px) 18px;border-radius:16px}
+.mode-btns #challengeBtn{grid-column:1/-1;order:1;justify-content:flex-start;text-align:left;gap:14px;font-size:clamp(23px,calc(var(--h,100vh)*.042),32px);line-height:1.1;padding:clamp(8px,calc(var(--h,100vh)*.022),16px) 18px;border-radius:16px}
 .mode-btns #challengeBtn>span:nth-child(2){flex:1}
 .mode-btns #challengeBtn svg.i{width:1.3em;height:1.3em}
 #challengeBtn small{display:block;font-family:"Nunito",sans-serif;font-weight:700;font-size:clamp(13px,calc(var(--h,100vh)*.023),16px);opacity:.8;margin-top:2px}
