@@ -102,7 +102,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .title{font-weight:700;font-size:clamp(40px,7.5vmin,84px);color:#fff;margin:1vh 0 0;letter-spacing:.5px;
   text-shadow:0 4px 0 var(--honey2),0 8px 18px rgba(0,0,0,.18);-webkit-text-stroke:2px var(--honey2)}
 .subtitle{font-size:clamp(18px,2.6vmin,28px);color:var(--ink);background:rgba(255,255,255,.85);padding:2px 16px;border-radius:999px;margin:.4vh 0 0;font-weight:500}
-.home-row{display:flex;align-items:center;gap:3vw;margin-top:2vh}
+.home-row{display:flex;align-items:center;gap:3vw;margin:auto 0}
 .bee{width:clamp(110px,18vmin,190px);animation:bob 2.4s ease-in-out infinite}
 .bee .wing{transform-origin:60px 40px;animation:flap .18s ease-in-out infinite alternate}
 @keyframes bob{50%{transform:translateY(-14px) rotate(-3deg)}}
@@ -115,14 +115,18 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .mode-btns .btn small{display:none;font-size:.5em;font-weight:500;opacity:.9}
 .mode-btns #challengeBtn small{display:block}
 
+.level-path{display:flex;align-items:center;justify-content:center}
+.lvl-node{border:0;background:#fff;border-radius:18px;padding:6px 8px;min-width:clamp(84px,14vw,130px);font:inherit;color:var(--ink);cursor:pointer;line-height:1.15;box-shadow:0 4px 0 #c9cfdc}
+.lvl-node .ic{display:block;font-size:clamp(24px,calc(var(--h,100vh)*.04),34px);line-height:1.1}
+.lvl-node b{display:block;font-size:clamp(15px,calc(var(--h,100vh)*.024),20px);font-weight:600}
+.lvl-node small{display:block;font-size:clamp(13px,calc(var(--h,100vh)*.02),16px);opacity:.75}
+.lvl-node.cur{background:var(--honey);color:#5a3500;box-shadow:0 4px 0 var(--honey2)}
+.lvl-node.done{background:#d9f7e8;box-shadow:0 4px 0 #9fdcbc}
+.lvl-node[disabled]{opacity:.6;cursor:default;box-shadow:0 2px 0 #c9cfdc}
+.lvl-link{flex:0 1 26px;min-width:8px;height:5px;background:#fff;opacity:.8}
+.bloom-line{text-align:center;font-weight:600;color:var(--meadow-ink);font-size:clamp(15px,calc(var(--h,100vh)*.024),20px);margin-top:6px}
 .meadow{margin-top:auto;width:min(1000px,100%);background:var(--meadow-bg);border-radius:28px;
   padding:12px 16px 10px;backdrop-filter:blur(2px)}
-.meadow-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:var(--meadow-ink);
-  font-size:clamp(16px,2.2vmin,22px);margin-bottom:4px}
-.garden{display:grid;grid-template-columns:repeat(var(--cols,10),1fr);gap:2px;justify-items:center}
-.garden svg{width:100%;max-width:var(--cw,58px);height:auto;display:block}
-.garden svg.pop{animation:grow .8s cubic-bezier(.3,1.6,.5,1)}
-@keyframes grow{from{transform:scale(.2) translateY(30%)}}
 .empty-note{padding:18px;text-align:center;font-size:clamp(18px,2.4vmin,24px);color:var(--meadow-ink)}
 
 /* learn + spell */
@@ -401,8 +405,8 @@ cat, dog, sun</pre>
         <li><b>Timer:</b> optional. It counts up and never ends the game.</li>
       </ul>
 
-      <h3>Stars, honey and the garden</h3>
-      <p>Right answers earn stars and honey, and daily play builds a 🔥 streak. Each word grows from a seed to a flower. Tiles can grow it to a bud, and typing it right on the first try, three times, makes it bloom. Tap 🎨 on the home screen to change the look.</p>
+      <h3>Stars, honey and blooms</h3>
+      <p>Right answers earn stars and honey, and daily play builds a 🔥 streak. The home screen shows the five levels and a count of words in bloom. A word blooms once it’s typed right on the first try three times. Tap 🎨 on the home screen to change the look.</p>
 
       <h3>Reports for grown-ups</h3>
       <p>Tap ⚙️ to see the <b>Report card</b>. Pick a child, then tap a level to see every word:</p>
@@ -448,8 +452,8 @@ cat, dog, sun</pre>
       </div>
     </div>
     <div class="meadow">
-      <div class="meadow-head"><span id="gardenTitle">Your garden</span><span id="gardenCount"></span></div>
-      <div class="garden" id="garden"></div>
+      <div class="level-path" id="levelPath"></div>
+      <div class="bloom-line" id="bloomLine"></div>
     </div>
   </section>
 
@@ -806,24 +810,6 @@ function beeSVG() {
   <circle cx="20" cy="22" r="4" fill="#2b2d42"/><circle cx="38" cy="16" r="4" fill="#2b2d42"/>${hatSVG()}</svg>`;
 }
 const PETALS = ['#ff7eb6', '#ff9f1c', '#8e6cff', '#ff6b6b', '#4cc9f0', '#f15bb5', '#ffd23f', '#9b5de5'];
-function hash(s) { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
-function flowerSVG(stage, word) {
-  const col = PETALS[hash(word) % PETALS.length];
-  const soil = `<ellipse cx="30" cy="68" rx="16" ry="5" fill="#8b5a2b" opacity=".85"/>`;
-  if (stage === 0) return `<svg viewBox="0 0 60 74" aria-label="seed">${soil}<ellipse cx="30" cy="64" rx="4" ry="3" fill="#6b3e1a"/></svg>`;
-  const stemTop = stage === 1 ? 50 : 26;
-  let s = `<svg viewBox="0 0 60 74" aria-label="${['seed', 'sprout', 'bud', 'flower'][stage]}">${soil}
-    <path d="M30 66 Q28 ${(66 + stemTop) / 2} 30 ${stemTop}" stroke="#3f9a2f" stroke-width="4" fill="none" stroke-linecap="round"/>
-    <path d="M30 ${stage === 1 ? 54 : 50} Q18 ${stage === 1 ? 44 : 40} 14 ${stage === 1 ? 50 : 46} Q22 ${stage === 1 ? 56 : 52} 30 ${stage === 1 ? 54 : 50}" fill="#5fc444"/>
-    <path d="M30 ${stage === 1 ? 52 : 44} Q42 ${stage === 1 ? 42 : 34} 46 ${stage === 1 ? 48 : 40} Q38 ${stage === 1 ? 54 : 46} 30 ${stage === 1 ? 52 : 44}" fill="#6fd453"/>`;
-  if (stage === 2) s += `<ellipse cx="30" cy="20" rx="7" ry="10" fill="${col}"/><path d="M23 24 Q30 32 37 24" fill="#5fc444"/>`;
-  if (stage === 3 && T().bloom) s += `<text x="30" y="32" font-size="32" text-anchor="middle">${T().bloom}</text>`;
-  else if (stage === 3) {
-    for (let i = 0; i < 6; i++) s += `<ellipse cx="30" cy="9" rx="7" ry="11" fill="${col}" transform="rotate(${i * 60} 30 20)"/>`;
-    s += `<circle cx="30" cy="20" r="7" fill="#ffd23f" stroke="#f0a500" stroke-width="2"/><circle cx="28" cy="18" r="1.4" fill="#2b2d42"/><circle cx="32.5" cy="18" r="1.4" fill="#2b2d42"/>`;
-  }
-  return s + '</svg>';
-}
 function stageOf(r) { if (!r) return 0; if (r.b >= 3) return 3; if (r.b === 2) return 2; return 1; }
 
 /* ---------- confetti ---------- */
@@ -877,31 +863,29 @@ function renderHeader() {
 }
 function dayKey(off) { const d = new Date(); d.setDate(d.getDate() + off); return d.toISOString().slice(0, 10); }
 
-let lastStages = {};
+function renderPath(L) {
+  const box = $('#levelPath'), line = $('#bloomLine');
+  if (!L) { box.innerHTML = '<div class="empty-note">🌱 No words yet! Ask a grown-up to tap ⚙️ to add words.</div>'; line.textContent = ''; return; }
+  box.innerHTML = levelMode() ? RL.map((k, i) => {
+    const n = i + 1, open = unlocked(n), b = bests['L' + n], link = i ? '<div class="lvl-link"></div>' : '';
+    return `${link}<button class="lvl-node ${passed(n) ? 'done' : ''} ${open && n === nextLevel() ? 'cur' : ''}" data-l="${n}" ${open ? '' : 'disabled'}><span class="ic">${passed(n) ? '⭐' : open ? THEMES[k].icon : '🔒'}</span><b>Level ${n}</b><small>${b ? `${b.score}/${b.n}` : open ? 'Play' : 'Locked'}</small></button>`;
+  }).join('') : '';
+  const P = prog(L.id), blooms = L.words.filter(({ w }) => stageOf(P[w]) === 3).length;
+  line.textContent = `${T().bloom || '🌸'} ${blooms} / ${L.words.length} words in bloom`;
+}
+// the level to work on: the first one not passed yet
+function nextLevel() { for (let n = 1; n <= 5; n++) if (!passed(n)) return n; return 5; }
 function renderHome() {
   renderHeader();
   $('#hello').textContent = (player ? `Hi ${player}! ` : '') + T().tag;
-  const L = activeList(), g = $('#garden');
+  const L = activeList();
   $('#loadHint').hidden = lists.some(l => LEVELS[l.id]);
   $('#roundTabs').innerHTML = lists.length > 1 ? lists.map((l, k) => {
     const P = prog(l.id), blooms = l.words.filter(({ w }) => stageOf(P[w]) === 3).length;
     return `<button class="round-tab ${L && l.id === L.id ? 'on' : ''}" data-id="${l.id}">${roundLabel(l, k)}<small>${T().icon} ${blooms} / ${l.words.length}</small></button>`;
   }).join('') : '';
   $('#learnBtn').disabled = $('#spellBtn').disabled = $('#buildBtn').disabled = $('#challengeBtn').disabled = !L;
-  if (!L) {
-    g.innerHTML = `<div class="empty-note" style="grid-column:1/-1">🌱 No words yet! Ask a grown-up to tap ⚙️ to add words.</div>`;
-    $('#gardenCount').textContent = ''; return;
-  }
-  const P = prog(L.id); let blooms = 0;
-  const n = L.words.length, W = Math.max(200, $('.meadow').clientWidth - 32);
-  const avail = innerHeight - $('.home-row').getBoundingClientRect().bottom - 76;   // room below the buttons
-  let cols = Math.min(n, 8), cw = 58;
-  for (; cols < 30; cols++) { cw = Math.min(W / cols, 58); if (Math.ceil(n / cols) * (cw * 74 / 60 + 2) <= avail) break; }
-  g.style.setProperty('--cols', cols); g.style.setProperty('--cw', cw + 'px');
-  g.innerHTML = L.words.map(({ w }) => { const st = stageOf(P[w]); if (st === 3) blooms++; return flowerSVG(st, w); }).join('');
-  [...g.children].forEach((el, i) => { const w = L.words[i].w, st = stageOf(P[w]); const k = L.id + ':' + w; if (lastStages[k] != null && lastStages[k] < st) el.classList.add('pop'); lastStages[k] = st; });
-  $('#gardenTitle').textContent = `${L.name} garden`;
-  $('#gardenCount').textContent = `🌸 ${blooms} / ${L.words.length} in bloom`;
+  renderPath(L);
 }
 
 /* ---------- picking words ---------- */
@@ -958,7 +942,7 @@ function endLearn() {
   show('done'); fillBee('#doneBee'); doneExtra(null);
   $('#doneTitle').textContent = `You learned ${S.words.length} words!`;
   $('#doneScore').textContent = '🌱'.repeat(Math.min(S.words.length, 8));
-  $('#doneSub').textContent = 'New sprouts are growing in your garden. Ready to spell them?';
+  $('#doneSub').textContent = 'Great listening! Ready to spell them?';
   $('#doneList').innerHTML = S.words.map(w => `<div class="res">${w.w}</div>`).join('');
   $('#doneNext').textContent = '✏️ Spell them!';
   $('#doneNext').onclick = () => startSpell(S.words);
@@ -1537,6 +1521,7 @@ function startPlayer(name) {
 }
 function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome(); }
 $('#homeBtn').onclick = goHome;
+$('#levelPath').onclick = e => { const b = e.target.closest('.lvl-node'); if (!b || b.disabled) return; actx(); sfx.tap(); chLevel = +b.dataset.l; save(); openChallenge(); };
 function openHelp() { newRun(); sfx.tap(); show('help'); document.querySelector('.help-card').scrollTop = 0; }
 $('#helpBtn').onclick = openHelp; $('#whoHelp').onclick = openHelp;
 $('#helpDone').onclick = () => (player ? goHome() : show('who'));
