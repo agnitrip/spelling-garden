@@ -253,6 +253,14 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
 .dot.no{background:var(--bad)}
 .fb-row{flex-wrap:wrap}
 .ch-act{font-size:clamp(17px,calc(var(--h,100vh)*.028),24px);padding:.3em .9em;box-shadow:0 5px 0 #c9cfdc}
+.help-card{align-items:stretch;gap:8px;overflow:auto;max-height:calc(var(--h,100vh) - 90px);margin:auto 0;-webkit-user-select:text;user-select:text;font-size:clamp(17px,2.4vmin,20px);line-height:1.45;padding-left:3vw;padding-right:3vw}
+.help-card>*{flex-shrink:0}
+.help-card h2{margin:0;font-size:clamp(24px,3.5vmin,34px)}
+.help-card h3{margin:12px 0 0;font-size:clamp(20px,2.9vmin,25px);color:var(--violet2)}
+.help-card p,.help-card ol,.help-card ul{margin:2px 0}
+.help-card ol,.help-card ul{padding-left:24px}
+.help-card li{margin-bottom:4px}
+.help-card pre{background:#f1eff8;border-radius:12px;padding:10px 14px;margin:4px 0;font:15px/1.4 ui-monospace,Menlo,monospace;overflow:auto;-webkit-user-select:text;user-select:text}
 /* live score, toasts, podium */
 .chip.score{padding:6px 14px;font-variant-numeric:tabular-nums}
 .chip.score.good{color:var(--good2)}
@@ -343,9 +351,72 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
     <div class="spacer"></div>
     <div class="chip player-chip" id="playerChip">👤 <span id="playerNameChip"></span></div>
     <div class="chip" id="listChip"><span class="ic">📚</span><span id="listName">No words yet</span></div>
+    <button class="iconbtn" id="helpBtn" aria-label="How to play">❓</button>
     <button class="iconbtn" id="themeBtn" aria-label="Pick a theme">🎨</button>
     <button class="iconbtn" id="gearBtn" aria-label="Grown-ups corner">⚙️</button>
   </header>
+
+  <!-- HELP -->
+  <section class="screen" id="help">
+    <div class="card help-card">
+      <div class="row" style="justify-content:space-between"><h2>❓ How to play</h2><button class="btn honey small" id="helpDone">Done ✓</button></div>
+
+      <h3>Getting started</h3>
+      <ol>
+        <li><b>Add it to your iPad.</b> Open this page in Safari, tap Share, then <b>Add to Home Screen</b>. It then opens full-screen like an app and works offline. It also runs in any web browser.</li>
+        <li><b>Type your child’s name.</b> The game asks who’s playing each time it opens. Each child keeps their own progress.</li>
+        <li><b>Add the words.</b> Tap ⚙️, then <b>Load a file</b> or paste the words in. The game comes with no words, so this step is needed once on each device.</li>
+        <li><b>Turn the sound on</b>, including the iPad’s silent switch. The voice is a big part of the game.</li>
+      </ol>
+
+      <h3>Word file format</h3>
+      <p>A plain text file. Put a tag line above each list, then one word per line. A practice sentence after a bar is optional.</p>
+      <pre># Medium Girl
+kite | My kite flew up high.
+green | The frog is green.
+
+# Big Girl
+garden | We planted seeds in the garden.
+
+# Week 12
+cat, dog, sun</pre>
+      <p>Use the tags <b># Medium Girl</b> and <b># Big Girl</b> with 50 words each to get all five Bee Challenge levels. Any other tag, like <b># Week 12</b>, makes its own practice round.</p>
+
+      <h3>The games</h3>
+      <ul>
+        <li><b>🏆 Bee Challenge:</b> the main game. It works like a real spelling bee, with 20 words and no hints.</li>
+        <li><b>👂 Listen &amp; Learn:</b> hear a word, watch it spelled letter by letter, then hear it in a sentence. Best for new words.</li>
+        <li><b>🧩 Build It:</b> hear a word and put letter tiles in order. A couple of extra letters are mixed in.</li>
+        <li><b>✏️ Spell It:</b> hear a word and type it. Two tries with hints, then the game shows the spelling and your child copies it.</li>
+      </ul>
+      <p>A good session: Learn, then Build, then Spell, with a Bee Challenge every couple of days. About 10 minutes is plenty.</p>
+
+      <h3>Bee Challenge rules</h3>
+      <ul>
+        <li><b>Mistakes:</b> the game shows and says the right spelling, then brings the word back at the end.</li>
+        <li><b>⏭️ Skip for now:</b> saves a hard word for the end.</li>
+        <li><b>End round:</b> each missed or skipped word gets one more try. A point is lost only if it’s still wrong then.</li>
+        <li><b>Levels:</b> 5 levels of 20 fixed words, from easier to harder. Score 16 out of 20 (80%) to unlock the next one.</li>
+        <li><b>Podium:</b> your child races four pretend players whose scores stay close to their best.</li>
+        <li><b>Timer:</b> optional. It counts up and never ends the game.</li>
+      </ul>
+
+      <h3>Stars, honey and the garden</h3>
+      <p>Right answers earn stars and honey, and daily play builds a 🔥 streak. Each word grows from a seed to a flower. Tiles can grow it to a bud, and typing it right on the first try, three times, makes it bloom. Tap 🎨 on the home screen to change the look.</p>
+
+      <h3>Reports for grown-ups</h3>
+      <p>Tap ⚙️ to see the <b>Report card</b>. Pick a child, then tap a level to see every word:</p>
+      <ul>
+        <li><b>✅ First try:</b> spelled right straight away.</li>
+        <li><b>🔁 Fixed on 2nd try:</b> wrong first, then corrected.</li>
+        <li><b>❌ Wrong:</b> still wrong after the second try.</li>
+      </ul>
+      <p>The report stays until you tap <b>Start over</b> in ⚙️. Change player and Remove player are there too.</p>
+
+      <h3>Your privacy</h3>
+      <p>Names, words and progress stay in this browser on this device. Nothing is sent anywhere, so progress doesn’t move between devices. Removing the app from the Home Screen deletes it.</p>
+    </div>
+  </section>
 
   <!-- WHO'S PLAYING -->
   <section class="screen" id="who">
@@ -357,6 +428,7 @@ header{display:flex;align-items:center;gap:10px;min-height:56px}
         <input type="text" id="whoName" placeholder="Type your name" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false">
         <button class="btn green" type="submit">Let’s go! ➜</button>
       </form>
+      <button type="button" class="btn ghost small" id="whoHelp">❓ How to play (for grown-ups)</button>
     </div>
   </section>
 
@@ -786,8 +858,8 @@ function tipFor(w) {
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   $('#homeBtn').style.display = id === 'home' ? 'none' : '';
-  $('#themeBtn').style.display = $('#playerChip').style.display = id === 'home' ? '' : 'none';
-  document.querySelector('header').style.visibility = id === 'who' ? 'hidden' : '';
+  $('#themeBtn').style.display = $('#helpBtn').style.display = $('#playerChip').style.display = id === 'home' ? '' : 'none';
+  document.querySelector('header').style.visibility = id === 'who' || (id === 'help' && !player) ? 'hidden' : '';
 }
 function bumpHoney(add) {
   honey += add; save(); $('#honeyNum').textContent = honey;
@@ -1460,6 +1532,9 @@ function startPlayer(name) {
 }
 function goHome() { newRun(); stopClock(); S = null; show('home'); renderHome(); }
 $('#homeBtn').onclick = goHome;
+function openHelp() { newRun(); sfx.tap(); show('help'); document.querySelector('.help-card').scrollTop = 0; }
+$('#helpBtn').onclick = openHelp; $('#whoHelp').onclick = openHelp;
+$('#helpDone').onclick = () => (player ? goHome() : show('who'));
 $('#gearBtn').onclick = () => { sfx.tap(); openSetup(); };
 $('#loadHint').onclick = () => { sfx.tap(); openSetup(); };
 $('#whoForm').onsubmit = e => { e.preventDefault(); const n = $('#whoName').value.trim(); if (n) { $('#whoName').blur(); startPlayer(players.find(x => pKey(x) === pKey(n)) || n); } else $('#whoName').focus(); };
